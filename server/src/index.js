@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 // 解析命令行参数
 const args = process.argv.slice(2);
-let maxFileSize = 100; // 默认100MB
+let maxFileSize = 200; // 默认200MB
 
 // 查找文件大小限制参数
 const maxSizeIndex = args.indexOf('--max-size');
