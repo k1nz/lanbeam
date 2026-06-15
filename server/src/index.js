@@ -3,9 +3,48 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const { WebSocketServer } = require('ws');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 创建 HTTP 服务器（供 Express 和 WebSocket 共用）
+const server = http.createServer(app);
+
+// WebSocket 服务
+const wss = new WebSocketServer({ server });
+
+// 共享文本状态
+let sharedText = '';
+
+wss.on('connection', (ws) => {
+    console.log('🔗 新客户端已连接到文本共享');
+
+    // 发送当前文本状态给新客户端
+    ws.send(JSON.stringify({ type: 'text-state', text: sharedText }));
+
+    ws.on('message', (data) => {
+        try {
+            const message = JSON.parse(data.toString());
+            if (message.type === 'text-update') {
+                sharedText = message.text;
+                // 广播给所有其他客户端
+                wss.clients.forEach((client) => {
+                    if (client !== ws && client.readyState === 1) {
+                        client.send(JSON.stringify({ type: 'text-update', text: sharedText }));
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('WebSocket 消息解析错误:', e);
+        }
+    });
+
+    ws.on('close', () => {
+        console.log('🔌 客户端已断开文本共享');
+    });
+});
 
 // 解析命令行参数
 const args = process.argv.slice(2);
@@ -409,7 +448,7 @@ const getLocalIPAddress = () => {
 };
 
 // 启动服务器 - 监听所有网络接口
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
     const localIPs = getLocalIPAddress();
     
     console.log(`🚀 文件传输服务器已启动`);
@@ -434,6 +473,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`   POST /api/upload    - 文件上传`);
     console.log(`   GET  /api/files     - 文件列表`);
     console.log(`   GET  /api/download  - 文件下载`);
+    console.log(`   WS   /              - 文本实时共享`);
     console.log(`\n⚙️  启动参数:`);
     console.log(`   --max-size <MB>     - 设置文件大小限制 (当前: ${maxFileSize}MB)`);
     console.log(`   例如: node index.js --max-size 200`);

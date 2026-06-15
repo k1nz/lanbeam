@@ -1,22 +1,22 @@
 import React from 'react'
 import FileUploader from './components/FileUploader'
 import FileList from './components/FileList'
+import TextShare from './components/TextShare'
 import ServerSettings from './components/ServerSettings'
 import { ToastProvider } from './components/Toast'
 import { useState } from 'react'
 import { getCurrentServerUrl } from './config/api'
-import { FolderOpen, Upload, Server, Users, Share2, MoreHorizontal, Settings } from 'lucide-react'
+import { FolderOpen, Upload, Server, Users, Share2, MoreHorizontal, Settings, FileText } from 'lucide-react'
 
 function App() {
   const [refreshFiles, setRefreshFiles] = useState(0)
-  const [activeView, setActiveView] = useState('files') // 'files', 'upload'
+  const [activeTab, setActiveTab] = useState('files') // 'files', 'text'
 
   const handleUploadSuccess = () => {
     setRefreshFiles(prev => prev + 1)
   }
 
   const handleServerChange = () => {
-    // 当服务器地址改变时，刷新文件列表
     setRefreshFiles(prev => prev + 1)
   }
 
@@ -45,69 +45,101 @@ function App() {
         </header>
 
         <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* 上传区域卡片 */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-            <div className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
-              <div className="text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">点击上传或拖拽文件</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  SVG, PNG, JPG 或 GIF (最大 800×400px)
-                </p>
-                <FileUploader onUploadSuccess={handleUploadSuccess} />
-              </div>
-            </div>
+          {/* 功能导航标签 */}
+          <div className="flex space-x-1 mb-6 bg-white rounded-lg border border-gray-200 p-1">
+            <button
+              onClick={() => setActiveTab('files')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'files'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <FolderOpen className="h-4 w-4" />
+              <span>文件传输</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('text')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'text'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <FileText className="h-4 w-4" />
+              <span>文本共享</span>
+            </button>
           </div>
 
-          {/* 附加文件区域 */}
-          <div className="bg-white rounded-lg border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">附加文件</h2>
-                <div className="flex items-center space-x-2">
-                  <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded border-b-2 border-transparent hover:border-gray-300">
-                    查看全部
-                  </button>
-                  <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded">
-                    我的文件
-                  </button>
-                  <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded">
-                    共享文件
-                  </button>
-                  <button className="text-gray-400 hover:text-gray-600 p-1 rounded">
-                    <MoreHorizontal className="h-5 w-5" />
-                  </button>
+          {activeTab === 'files' ? (
+            <>
+              {/* 上传区域卡片 */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
+                  <div className="text-center">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">点击上传或拖拽文件</h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      SVG, PNG, JPG 或 GIF (最大 800×400px)
+                    </p>
+                    <FileUploader onUploadSuccess={handleUploadSuccess} />
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="mb-4">
-                <p className="text-sm text-gray-500">
-                  已附加到此项目的文件和资源。
-                </p>
-              </div>
-              
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                  <div className="flex items-center justify-between text-sm font-medium text-gray-700">
-                    <div className="flex items-center space-x-4">
-                      <input type="checkbox" className="rounded border-gray-300" />
-                      <span>文件名</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-8 text-right">
-                      <span>文件大小</span>
-                      <span>上传日期</span>
-                      <span>最后更新</span>
-                      <span>上传者</span>
+
+              {/* 附加文件区域 */}
+              <div className="bg-white rounded-lg border border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-gray-900">附加文件</h2>
+                    <div className="flex items-center space-x-2">
+                      <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded border-b-2 border-transparent hover:border-gray-300">
+                        查看全部
+                      </button>
+                      <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded">
+                        我的文件
+                      </button>
+                      <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded">
+                        共享文件
+                      </button>
+                      <button className="text-gray-400 hover:text-gray-600 p-1 rounded">
+                        <MoreHorizontal className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
                 </div>
-                
-                <FileList refreshTrigger={refreshFiles} />
+
+                <div className="p-6">
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-500">
+                      已附加到此项目的文件和资源。
+                    </p>
+                  </div>
+
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                      <div className="flex items-center justify-between text-sm font-medium text-gray-700">
+                        <div className="flex items-center space-x-4">
+                          <input type="checkbox" className="rounded border-gray-300" />
+                          <span>文件名</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-8 text-right">
+                          <span>文件大小</span>
+                          <span>上传日期</span>
+                          <span>最后更新</span>
+                          <span>上传者</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <FileList refreshTrigger={refreshFiles} />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            <TextShare />
+          )}
 
           {/* 服务器状态信息 */}
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
