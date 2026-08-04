@@ -1,4 +1,3 @@
-import React from 'react'
 import FileUploader from './components/FileUploader'
 import FileList from './components/FileList'
 import TextShare from './components/TextShare'
@@ -9,9 +8,11 @@ import { ServerProvider, useServer } from './components/serverContext'
 import { useState } from 'react'
 import { FolderOpen, Upload, Server, FileText, File } from 'lucide-react'
 
+type Tab = 'files' | 'text'
+
 function AppContent() {
   const [refreshFiles, setRefreshFiles] = useState(0)
-  const [activeTab, setActiveTab] = useState('files') // 'files', 'text'
+  const [activeTab, setActiveTab] = useState<Tab>('files')
   const { serverUrl } = useServer()
 
   const handleUploadSuccess = () => {

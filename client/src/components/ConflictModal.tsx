@@ -1,7 +1,13 @@
-import React from 'react'
 import { AlertTriangle, X } from 'lucide-react'
 
-const ConflictModal = ({ conflicts, onConfirm, onCancel, isVisible }) => {
+interface ConflictModalProps {
+  conflicts: string[]
+  onConfirm: () => void
+  onCancel: () => void
+  isVisible: boolean
+}
+
+const ConflictModal = ({ conflicts, onConfirm, onCancel, isVisible }: ConflictModalProps) => {
   if (!isVisible) return null
 
   return (
@@ -19,7 +25,7 @@ const ConflictModal = ({ conflicts, onConfirm, onCancel, isVisible }) => {
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-3">
             以下文件已存在，是否要覆盖？
@@ -32,7 +38,7 @@ const ConflictModal = ({ conflicts, onConfirm, onCancel, isVisible }) => {
             ))}
           </div>
         </div>
-        
+
         <div className="flex space-x-3">
           <button
             onClick={onCancel}

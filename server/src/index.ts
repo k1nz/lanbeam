@@ -1,13 +1,17 @@
-const express = require('express');
-const multer = require('multer');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const http = require('http');
-const { WebSocketServer } = require('ws');
+import express from 'express';
+import multer from 'multer';
+import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import http from 'http';
+import { networkInterfaces } from 'os';
+import { WebSocketServer, WebSocket } from 'ws';
+import type { RawData } from 'ws';
+import type { AddressInfo } from 'net';
+import type { Request, Response, NextFunction } from 'express';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 // 创建 HTTP 服务器（供 Express 和 WebSocket 共用）
 const server = http.createServer(app);
@@ -17,8 +21,8 @@ const wss = new WebSocketServer({ server });
 
 // ws 会把 http server 的错误转发到 wss，必须有监听器兜底，
 // 否则 EADDRINUSE 会先在这里抛出，导致端口重试逻辑无法执行
-wss.on('error', (err) => {
-    if (err.code !== 'EADDRINUSE') {
+wss.on('error', (err: Error) => {
+    if ((err as NodeJS.ErrnoException).code !== 'EADDRINUSE') {
         console.error('WebSocket 服务器错误:', err);
     }
 });
@@ -26,42 +30,41 @@ wss.on('error', (err) => {
 // 共享文本状态
 let sharedText = '';
 // 共享图片列表（每条带唯一 id 与上传时间，限制条数与单张大小，防止内存无限增长）
-let sharedImages = [];
-let imageIdCount = 0;
+let sharedImages: SharedImage[] = [];
 const MAX_IMAGES = 20;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 单张 10MB
 
 // 向其他客户端广播 JSON 消息
-const broadcastJSON = (ws, payload) => {
+const broadcastJSON = (ws: WebSocket, payload: Buffer | string) => {
     wss.clients.forEach((client) => {
-        if (client !== ws && client.readyState === 1) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(payload);
         }
     });
 };
 
 // 生成二进制帧：2 字节头部长度 + JSON 头（仅元数据）+ 图片字节
-const buildImageFrame = (id, timestamp, mimeType, data) => {
-    const header = JSON.stringify({
+const buildImageFrame = (id: string, timestamp: string, mimeType: string, data: Buffer): Buffer => {
+    const header: ImageAddHeader = {
         type: 'image-add-binary',
-        image: { id, timestamp, mimeType }
-    });
-    const headerBuf = Buffer.from(header);
+        image: { id, mimeType }
+    };
+    const headerBuf = Buffer.from(JSON.stringify(header));
     const lenBuf = Buffer.alloc(2);
     lenBuf.writeUInt16BE(headerBuf.length);
     return Buffer.concat([lenBuf, headerBuf, data]);
 };
 
 // 解析二进制帧，返回 { header, imageBytes }
-const parseImageFrame = (buf) => {
+const parseImageFrame = (buf: Buffer): { header: ImageAddHeader; imageBytes: Buffer } => {
     const headerLen = buf.readUInt16BE(0);
-    const header = JSON.parse(buf.slice(2, 2 + headerLen).toString());
+    const header = JSON.parse(buf.slice(2, 2 + headerLen).toString()) as ImageAddHeader;
     const imageBytes = buf.subarray(2 + headerLen);
     return { header, imageBytes };
 };
 
 // 发送完整状态（文本 + 图片元数据），随后逐个发送图片二进制数据
-const sendFullState = (ws) => {
+const sendFullState = (ws: WebSocket) => {
     ws.send(JSON.stringify({
         type: 'text-state',
         text: sharedText,
@@ -73,7 +76,7 @@ const sendFullState = (ws) => {
 };
 
 // 在内存中保留最近的图片（同 id 覆盖，防止重复；data 仅用于新连接重放）
-const keepImage = (id, timestamp, mimeType, data) => {
+const keepImage = (id: string, timestamp: string, mimeType: string, data: Buffer) => {
     sharedImages = sharedImages.filter((img) => img.id !== id);
     sharedImages.push({ id, timestamp, mimeType, data });
     if (sharedImages.length > MAX_IMAGES) {
@@ -81,7 +84,14 @@ const keepImage = (id, timestamp, mimeType, data) => {
     }
 };
 
-wss.on('connection', (ws) => {
+// ws 文本/二进制数据统一转成 Buffer（兼容 Buffer、ArrayBuffer、Buffer[] 三种形态）
+const toBuffer = (data: RawData): Buffer => {
+    if (Buffer.isBuffer(data)) return data;
+    if (data instanceof ArrayBuffer) return Buffer.from(data);
+    return Buffer.concat(data);
+};
+
+wss.on('connection', (ws: WebSocket) => {
     console.log('🔗 新客户端已连接到文本共享');
 
     // 发送当前文本和图片状态给新客户端
@@ -90,7 +100,7 @@ wss.on('connection', (ws) => {
     ws.on('message', (data, isBinary) => {
         // 图片以二进制帧传输（客户端本地已有字节，服务器转发即可，无需额外存储）
         if (isBinary) {
-            const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+            const buf = toBuffer(data);
             try {
                 const { header, imageBytes } = parseImageFrame(buf);
                 if (header.type === 'image-add-binary') {
@@ -111,9 +121,9 @@ wss.on('connection', (ws) => {
         }
 
         try {
-            const message = JSON.parse(data.toString());
+            const message = JSON.parse(toBuffer(data).toString()) as WsMessage;
             if (message.type === 'text-update') {
-                sharedText = message.text;
+                sharedText = message.text ?? '';
                 // 广播给所有其他客户端
                 broadcastJSON(ws, JSON.stringify({ type: 'text-update', text: sharedText }));
             } else if (message.type === 'image-delete') {
@@ -166,11 +176,11 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // CORS 配置 - 允许局域网访问
-const corsOptions = {
+const corsOptions: cors.CorsOptions = {
     origin: function (origin, callback) {
         // 允许没有 origin 的请求（如移动应用、Postman）
         if (!origin) return callback(null, true);
-        
+
         // 允许所有 localhost 和局域网地址
         const allowedOrigins = [
             /^http:\/\/localhost(:\d+)?$/,
@@ -179,9 +189,9 @@ const corsOptions = {
             /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,
             /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$/
         ];
-        
+
         const isAllowed = allowedOrigins.some(pattern => pattern.test(origin));
-        
+
         if (isAllowed) {
             callback(null, true);
         } else {
@@ -223,11 +233,12 @@ const upload = multer({
 });
 
 // 路由
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
+    const address = server.address() as AddressInfo | null;
     res.json({
         message: '文件传输服务器运行中',
         version: '1.0.0',
-        port: server.address().port,
+        port: address ? address.port : currentPort,
         endpoints: {
             upload: 'POST /api/upload',
             files: 'GET /api/files',
@@ -237,10 +248,10 @@ app.get('/', (req, res) => {
 });
 
 // 检查文件是否存在接口
-app.post('/api/check-files', (req, res) => {
+app.post('/api/check-files', (req: Request, res: Response) => {
     try {
-        const { fileNames } = req.body;
-        
+        const { fileNames } = req.body as { fileNames?: unknown };
+
         if (!fileNames || !Array.isArray(fileNames)) {
             return res.status(400).json({
                 success: false,
@@ -248,15 +259,15 @@ app.post('/api/check-files', (req, res) => {
             });
         }
 
-        const conflicts = [];
-        fileNames.forEach(fileName => {
+        const conflicts: string[] = [];
+        (fileNames as string[]).forEach(fileName => {
             const filePath = path.join(uploadDir, fileName);
-            
+
             // 安全检查：确保文件路径在上传目录内
             if (!filePath.startsWith(uploadDir)) {
                 return;
             }
-            
+
             if (fs.existsSync(filePath)) {
                 conflicts.push(fileName);
             }
@@ -271,13 +282,13 @@ app.post('/api/check-files', (req, res) => {
         res.status(500).json({
             success: false,
             message: '检查文件冲突失败',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 });
 
 // 文件上传接口
-app.post('/api/upload', upload.array('files'), (req, res) => {
+app.post('/api/upload', upload.array('files'), (req: Request, res: Response) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({
@@ -286,31 +297,33 @@ app.post('/api/upload', upload.array('files'), (req, res) => {
             });
         }
 
-        const uploadedFiles = [];
+        const uploadedFiles: UploadedFile[] = [];
+        // upload.array('files') 保证 req.files 是数组形态
+        const files = req.files as Express.Multer.File[];
 
         // 处理每个文件
-        req.files.forEach((file, index) => {
+        files.forEach((file, index) => {
             // 正确解码中文文件名
             const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
-            
+
             // 获取相对路径
             const fieldName = `relativePath[files[${index}]]`;
             const relativePath = req.body[fieldName] || originalName;
-            
+
             // 如果有相对路径且不等于文件名，说明是文件夹上传
             if (relativePath !== originalName) {
                 // 计算目标路径
                 const targetDir = path.join(uploadDir, path.dirname(relativePath));
                 const targetPath = path.join(uploadDir, relativePath);
-                
+
                 // 确保目标目录存在
                 if (!fs.existsSync(targetDir)) {
                     fs.mkdirSync(targetDir, { recursive: true });
                 }
-                
+
                 // 移动文件到正确的位置
                 fs.renameSync(file.path, targetPath);
-                
+
                 uploadedFiles.push({
                     originalName: originalName,
                     filename: path.basename(relativePath),
@@ -350,20 +363,20 @@ app.post('/api/upload', upload.array('files'), (req, res) => {
         res.status(500).json({
             success: false,
             message: '文件上传失败',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 });
 
 // 递归读取文件夹结构
-const readDirectoryStructure = (dir, relativePath = '') => {
-    const items = [];
+const readDirectoryStructure = (dir: string, relativePath = ''): FileItem[] => {
+    const items: FileItem[] = [];
     const entries = fs.readdirSync(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         const itemRelativePath = path.join(relativePath, entry.name);
-        
+
         if (entry.isDirectory()) {
             // 递归读取子文件夹
             const children = readDirectoryStructure(fullPath, itemRelativePath);
@@ -382,19 +395,19 @@ const readDirectoryStructure = (dir, relativePath = '') => {
                 path: itemRelativePath,
                 size: stats.size,
                 uploadTime: stats.birthtime.toISOString(),
-                modifiedTime: stats.mtime.toISOString()
+                modifyTime: stats.mtime.toISOString()
             });
         }
     }
-    
+
     return items;
 };
 
 // 获取已上传文件列表
-app.get('/api/files', (req, res) => {
+app.get('/api/files', (req: Request, res: Response) => {
     try {
         const fileStructure = readDirectoryStructure(uploadDir);
-        
+
         res.json({
             success: true,
             files: fileStructure
@@ -404,13 +417,13 @@ app.get('/api/files', (req, res) => {
         res.status(500).json({
             success: false,
             message: '获取文件列表失败',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 });
 
 // 文件下载接口
-app.get('/api/download/*', (req, res) => {
+app.get('/api/download/*', (req: Request, res: Response) => {
     try {
         // 获取完整的文件路径（支持子文件夹）
         const filePath = req.params[0];
@@ -433,7 +446,7 @@ app.get('/api/download/*', (req, res) => {
 
         // 获取文件名用于下载
         const filename = path.basename(filePath);
-        
+
         res.download(fullPath, filename, (err) => {
             if (err) {
                 console.error('文件下载错误:', err);
@@ -448,13 +461,13 @@ app.get('/api/download/*', (req, res) => {
         res.status(500).json({
             success: false,
             message: '文件下载失败',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 });
 
 // 删除文件接口
-app.delete('/api/files/*', (req, res) => {
+app.delete('/api/files/*', (req: Request, res: Response) => {
     try {
         // 获取完整的文件路径（支持子文件夹）
         const filePath = req.params[0];
@@ -476,7 +489,7 @@ app.delete('/api/files/*', (req, res) => {
         }
 
         const stats = fs.statSync(fullPath);
-        
+
         if (stats.isDirectory()) {
             // 删除文件夹及其内容
             fs.rmSync(fullPath, { recursive: true, force: true });
@@ -497,13 +510,13 @@ app.delete('/api/files/*', (req, res) => {
         res.status(500).json({
             success: false,
             message: '文件删除失败',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 });
 
 // 错误处理中间件
-app.use((error, req, res, next) => {
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     if (error instanceof multer.MulterError) {
         if (error.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
@@ -512,7 +525,7 @@ app.use((error, req, res, next) => {
             });
         }
     }
-    
+
     console.error('服务器错误:', error);
     res.status(500).json({
         success: false,
@@ -521,13 +534,14 @@ app.use((error, req, res, next) => {
 });
 
 // 获取本机 IP 地址的函数
-const getLocalIPAddress = () => {
-    const { networkInterfaces } = require('os');
+const getLocalIPAddress = (): string[] => {
     const nets = networkInterfaces();
-    const results = [];
+    const results: string[] = [];
 
     for (const name of Object.keys(nets)) {
-        for (const net of nets[name]) {
+        const interfaces = nets[name];
+        if (!interfaces) continue;
+        for (const net of interfaces) {
             // 跳过非 IPv4 和内部（即 127.x.x.x）地址
             if (net.family === 'IPv4' && !net.internal) {
                 results.push(net.address);
@@ -545,14 +559,15 @@ let attempts = 0;
 
 const tryListen = () => {
     server.once('error', (err) => {
-        if (err.code === 'EADDRINUSE' && attempts < MAX_PORT_ATTEMPTS) {
+        const code = (err as NodeJS.ErrnoException).code;
+        if (code === 'EADDRINUSE' && attempts < MAX_PORT_ATTEMPTS) {
             const oldPort = currentPort;
             currentPort++;
             attempts++;
             console.log(`⚠️  端口 ${oldPort} 已被占用，尝试切换到端口 ${currentPort}...`);
             tryListen();
         } else {
-            console.error(`❌ 无法监听端口 ${currentPort}${err.code === 'EADDRINUSE' ? `（已尝试 ${MAX_PORT_ATTEMPTS} 个端口）` : ''}:`, err.message);
+            console.error(`❌ 无法监听端口 ${currentPort}${code === 'EADDRINUSE' ? `（已尝试 ${MAX_PORT_ATTEMPTS} 个端口）` : ''}:`, err.message);
             process.exit(1);
         }
     });
@@ -595,3 +610,46 @@ server.on('listening', () => {
 });
 
 tryListen();
+
+// ===== 类型定义 =====
+
+// 内存中共享的图片
+interface SharedImage {
+    id: string;
+    timestamp: string;
+    mimeType: string;
+    data: Buffer;
+}
+
+// 二进制帧头（仅元数据，不含图片字节）
+interface ImageAddHeader {
+    type: 'image-add-binary';
+    image: { id: string; mimeType: string };
+}
+
+// WebSocket 文本消息
+type WsMessage =
+    | { type: 'text-update'; text?: string }
+    | { type: 'image-delete'; id: string };
+
+// 上传结果条目
+interface UploadedFile {
+    originalName: string;
+    filename: string;
+    relativePath: string;
+    fullPath: string;
+    size: number;
+    mimetype: string;
+    uploadTime: string;
+}
+
+// 文件树节点（/api/files 返回结构，与前端 client/src/types.ts 对应）
+interface FileItem {
+    name: string;
+    type: 'file' | 'directory';
+    path: string;
+    size?: number;
+    uploadTime?: string;
+    modifyTime?: string;
+    children?: FileItem[];
+}

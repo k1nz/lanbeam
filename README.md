@@ -140,7 +140,7 @@ Click the share button in the top-right to copy the page URL. Send it to any dev
 
 ```bash
 # 使用命令行参数（单位为 MB）/ Command-line argument (in MB)
-node server/src/index.js --max-size 200
+node server/dist/index.js --max-size 200
 
 # 或使用环境变量 / Or via environment variable
 MAX_FILE_SIZE=200 pnpm dev:server
@@ -150,6 +150,7 @@ MAX_FILE_SIZE=200 pnpm dev:server
 
 ## 🛠️ 技术栈 / Tech Stack
 
+- **语言 / Language**：TypeScript（编译器使用 Go 版原生编译器 tsgo / the native Go compiler tsgo）
 - **前端 / Frontend**：React + Vite + Tailwind CSS
 - **后端 / Backend**：Node.js + Express + Multer
 - **实时通信 / Real-time**：WebSocket (ws)

@@ -1,7 +1,28 @@
-import React, { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import { CheckCircle, AlertCircle, AlertTriangle, X } from 'lucide-react'
 
-const ToastContext = createContext()
+export type ToastType = 'success' | 'error' | 'warning' | 'info'
+
+export interface Toast {
+  id: string
+  title: string
+  description?: string
+  type: ToastType
+}
+
+export interface ToastOptions {
+  title: string
+  description?: string
+  type?: ToastType
+  duration?: number
+}
+
+interface ToastContextValue {
+  showToast: (options: ToastOptions) => void
+  removeToast: (id: string) => void
+}
+
+const ToastContext = createContext<ToastContextValue | null>(null)
 
 export const useToast = () => {
   const context = useContext(ToastContext)
@@ -11,13 +32,13 @@ export const useToast = () => {
   return context
 }
 
-export const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([])
+export const ToastProvider = ({ children }: { children: ReactNode }) => {
+  const [toasts, setToasts] = useState<Toast[]>([])
 
-  const showToast = ({ title, description, type = 'info', duration = 5000 }) => {
+  const showToast = ({ title, description, type = 'info', duration = 5000 }: ToastOptions) => {
     const id = Math.random().toString(36).substr(2, 9)
-    const toast = { id, title, description, type }
-    
+    const toast: Toast = { id, title, description, type }
+
     setToasts(prev => [...prev, toast])
 
     // 自动移除 toast
@@ -26,11 +47,11 @@ export const ToastProvider = ({ children }) => {
     }, duration)
   }
 
-  const removeToast = (id) => {
+  const removeToast = (id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }
 
-  const getToastIcon = (type) => {
+  const getToastIcon = (type: ToastType): ReactNode => {
     switch (type) {
       case 'success':
         return <CheckCircle className="h-5 w-5 text-green-500" />
@@ -43,7 +64,7 @@ export const ToastProvider = ({ children }) => {
     }
   }
 
-  const getToastStyles = (type) => {
+  const getToastStyles = (type: ToastType): string => {
     switch (type) {
       case 'success':
         return 'bg-green-50 border-green-200'
@@ -59,7 +80,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast, removeToast }}>
       {children}
-      
+
       {/* Toast 容器 */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map((toast) => (

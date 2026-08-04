@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { RefreshCw, FolderOpen } from 'lucide-react'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useToast } from './Toast'
 import { API_CONFIG } from '../config/api'
 import { useServer } from './serverContext'
 import FileTree from './FileTree'
+import type { FileNode } from '../types'
 
-const FileList = ({ refreshTrigger }) => {
-  const [files, setFiles] = useState([])
+interface FileListResponse {
+  success: boolean
+  files: FileNode[]
+}
+
+interface FileListProps {
+  refreshTrigger: number
+}
+
+const FileList = ({ refreshTrigger }: FileListProps) => {
+  const [files, setFiles] = useState<FileNode[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const { showToast } = useToast()
   const { serverReady } = useServer()
 
@@ -17,7 +27,7 @@ const FileList = ({ refreshTrigger }) => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.files}`)
+      const response = await axios.get<FileListResponse>(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.files}`)
 
       if (response.data.success) {
         setFiles(response.data.files || [])
@@ -39,24 +49,22 @@ const FileList = ({ refreshTrigger }) => {
     }
   }, [refreshTrigger, serverReady])
 
-
-
-  const handleDownload = async (filePath) => {
+  const handleDownload = async (filePath: string) => {
     try {
       const response = await axios.get(`${API_CONFIG.baseURL}/api/download/${encodeURIComponent(filePath)}`, {
         responseType: 'blob'
       })
-      
+
       // 创建下载链接
       const url = window.URL.createObjectURL(new Blob([response.data]))
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', filePath.split('/').pop()) // 使用文件名
+      link.setAttribute('download', filePath.split('/').pop() || '') // 使用文件名
       document.body.appendChild(link)
       link.click()
       link.remove()
       window.URL.revokeObjectURL(url)
-      
+
       showToast({
         title: '下载成功',
         description: `文件 ${filePath.split('/').pop()} 下载完成`,
@@ -64,18 +72,19 @@ const FileList = ({ refreshTrigger }) => {
       })
     } catch (error) {
       console.error('下载失败:', error)
+      const message = (error as AxiosError<{ message?: string }>).response?.data?.message
       showToast({
         title: '下载失败',
-        description: error.response?.data?.message || '文件下载时发生错误',
+        description: message || '文件下载时发生错误',
         type: 'error'
       })
     }
   }
 
-  const handleDelete = async (filePath) => {
+  const handleDelete = async (filePath: string) => {
     try {
       const response = await axios.delete(`${API_CONFIG.baseURL}/api/files/${encodeURIComponent(filePath)}`)
-      
+
       if (response.data.success) {
         // 刷新文件列表
         fetchFiles()
@@ -87,9 +96,10 @@ const FileList = ({ refreshTrigger }) => {
       }
     } catch (error) {
       console.error('删除失败:', error)
+      const message = (error as AxiosError<{ message?: string }>).response?.data?.message
       showToast({
         title: '删除失败',
-        description: error.response?.data?.message || '删除时发生错误',
+        description: message || '删除时发生错误',
         type: 'error'
       })
     }
@@ -154,7 +164,7 @@ const FileList = ({ refreshTrigger }) => {
           </button>
         </div>
       ) : (
-        <FileTree 
+        <FileTree
           files={files}
           onDownload={handleDownload}
           onDelete={handleDelete}

@@ -1,27 +1,46 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, type ChangeEvent, type ClipboardEvent } from 'react'
 import { getCurrentServerUrl } from '../config/api'
 import { useToast } from './Toast'
 import ImageLightbox from './ImageLightbox'
 import { Wifi, WifiOff, Copy, Trash2, ClipboardPaste, Image as ImageIcon, X } from 'lucide-react'
+import type { SharedImage } from '../types'
+
+// 待发送图片帧
+interface SendQueueItem {
+  id: string
+  imageBytes: Uint8Array
+  mimeType: string
+}
+
+// 收到/发出的文本消息
+type WsMessage =
+  | { type: 'text-update' | 'text-state'; text: string; images?: { id: string; timestamp: string }[] }
+  | { type: 'image-delete'; id: string }
+
+// 图片二进制帧头
+interface ImageAddHeader {
+  type: 'image-add-binary'
+  image: { id: string; timestamp: string; mimeType?: string }
+}
 
 // 图片按添加时间从新到旧排序（新图片显示在最前）
-const sortImages = (images) => [...images].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))
+const sortImages = (images: SharedImage[]): SharedImage[] =>
+  [...images].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))
 
 export default function TextShare() {
   const [text, setText] = useState('')
-  const [images, setImages] = useState([])
+  const [images, setImages] = useState<SharedImage[]>([])
   const [connected, setConnected] = useState(false)
-  const [pasteCount, setPasteCount] = useState(0) // 触发图片粘贴预览的重新布局
-  const [previewId, setPreviewId] = useState(null) // 正在预览的图片 id
+  const [previewId, setPreviewId] = useState<string | null>(null) // 正在预览的图片 id
   const { showToast } = useToast()
-  const wsRef = useRef(null)
-  const textareaRef = useRef(null)
+  const wsRef = useRef<WebSocket | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fromServerRef = useRef(false)
   // 网络字节（发送用）与 blobUrl（预览用）分开存，避免跨标签页共享
-  const bytesRef = useRef(new Map())
-  const blobUrlsRef = useRef(new Map())
+  const bytesRef = useRef(new Map<string, Uint8Array>())
+  const blobUrlsRef = useRef(new Map<string, string>())
   // 每次事件循环处理一帧，保证粘贴多张图片时有序发送
-  const sendQueueRef = useRef([])
+  const sendQueueRef = useRef<SendQueueItem[]>([])
   const sendingRef = useRef(false)
 
   const wsUrl = getCurrentServerUrl().replace(/^http/, 'ws')
@@ -42,14 +61,14 @@ export default function TextShare() {
       setImages([])
     }
 
-    ws.onmessage = (event) => {
+    ws.onmessage = (event: MessageEvent) => {
       if (event.data instanceof Blob) {
         handleImageMessage(event.data)
         return
       }
 
       try {
-        const message = JSON.parse(event.data)
+        const message = JSON.parse(event.data) as WsMessage
         if (message.type === 'text-update' || message.type === 'text-state') {
           fromServerRef.current = true
           setText(message.text)
@@ -87,11 +106,11 @@ export default function TextShare() {
   // ===== 图片相关逻辑 =====
 
   // 收到二进制帧：2 字节头部长度 + JSON 头 + 图片字节
-  const handleImageMessage = async (blob) => {
+  const handleImageMessage = async (blob: Blob) => {
     try {
       const buf = await blob.arrayBuffer()
       const headerLen = new DataView(buf).getUint16(0)
-      const header = JSON.parse(new TextDecoder().decode(buf.slice(2, 2 + headerLen)))
+      const header = JSON.parse(new TextDecoder().decode(buf.slice(2, 2 + headerLen))) as ImageAddHeader
       if (header.type === 'image-add-binary') {
         const { id, timestamp } = header.image
         const imageBytes = new Uint8Array(buf, 2 + headerLen)
@@ -109,7 +128,7 @@ export default function TextShare() {
   }
 
   // 为待接收的图片注册占位信息（数据到达后再生成预览）
-  const addPendingImage = (id, timestamp) => {
+  const addPendingImage = (id: string, timestamp: string) => {
     setImages((prev) => {
       if (prev.some((img) => img.id === id)) return prev
       const next = [...prev, { id, blobUrl: null, timestamp }]
@@ -117,7 +136,7 @@ export default function TextShare() {
     })
   }
 
-  const removeLocalImage = (id) => {
+  const removeLocalImage = (id: string) => {
     const blobUrl = blobUrlsRef.current.get(id)
     if (blobUrl) URL.revokeObjectURL(blobUrl)
     blobUrlsRef.current.delete(id)
@@ -125,7 +144,7 @@ export default function TextShare() {
     setImages((prev) => prev.filter((img) => img.id !== id))
   }
 
-  const sendImage = (id, imageBytes, mimeType) => {
+  const sendImage = (id: string, imageBytes: Uint8Array, mimeType: string) => {
     const header = JSON.stringify({
       type: 'image-add-binary',
       image: { id, mimeType }
@@ -137,7 +156,7 @@ export default function TextShare() {
     frame.set(lenBuf, 0)
     frame.set(headerBuf, 2)
     frame.set(imageBytes, 2 + headerBuf.length)
-    wsRef.current.send(frame.buffer)
+    wsRef.current?.send(frame.buffer)
   }
 
   // 队列发送：同一时间只发一张，保证多张图片按顺序到达
@@ -155,7 +174,7 @@ export default function TextShare() {
     }
   }
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value
     setText(newText)
 
@@ -169,7 +188,7 @@ export default function TextShare() {
     }
   }
 
-  const handlePaste = (e) => {
+  const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
     const items = e.clipboardData?.items
     if (!items) return
     let hasImage = false
@@ -202,12 +221,11 @@ export default function TextShare() {
     }
 
     if (hasImage) {
-      setPasteCount((c) => c + 1)
       e.preventDefault() // 阻止粘贴事件在文本框中插入图片路径之类的内容
     }
   }
 
-  const handleRemoveImage = (id) => {
+  const handleRemoveImage = (id: string) => {
     removeLocalImage(id)
     if (previewId === id) setPreviewId(null)
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -216,7 +234,8 @@ export default function TextShare() {
   }
 
   // 把图片复制到剪贴板（ClipboardItem 需在 https 或 localhost 下可用）
-  const copyImageToClipboard = async (id) => {
+  const copyImageToClipboard = async (id: string | null) => {
+    if (!id) return
     try {
       const blobUrl = blobUrlsRef.current.get(id)
       if (!blobUrl) {
@@ -257,7 +276,7 @@ export default function TextShare() {
     blobUrlsRef.current.clear()
     setImages([])
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      ids.forEach((id) => wsRef.current.send(JSON.stringify({ type: 'image-delete', id })))
+      ids.forEach((id) => wsRef.current?.send(JSON.stringify({ type: 'image-delete', id })))
     }
   }
 

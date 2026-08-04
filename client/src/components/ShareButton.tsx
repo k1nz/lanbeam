@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Share2, Copy, Check, X } from 'lucide-react'
 import { useToast } from './Toast'
 
 // 复制文本到剪贴板
 // 局域网 http 环境不属于安全上下文（isSecureContext），navigator.clipboard 不可用，需降级为 execCommand
-const copyToClipboard = async (text) => {
+const copyToClipboard = async (text: string): Promise<void> => {
   // 优先使用异步 Clipboard API（https / localhost 安全上下文可用）
   if (navigator.clipboard && window.isSecureContext) {
     try {
@@ -15,7 +15,7 @@ const copyToClipboard = async (text) => {
     }
   }
   // 降级方案：非安全上下文或权限受限时使用 execCommand
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const textarea = document.createElement('textarea')
     textarea.value = text
     textarea.style.position = 'fixed'

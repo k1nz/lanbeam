@@ -1,29 +1,37 @@
-import React, { useState } from 'react'
-import { Download, Trash2, File, Folder, FolderOpen, ChevronRight, ChevronDown, MoreHorizontal, Edit } from 'lucide-react'
+import { useState } from 'react'
+import { Download, Trash2, File, Folder, FolderOpen, ChevronRight, ChevronDown, MoreHorizontal } from 'lucide-react'
+import type { FileNode } from '../types'
 
-const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
+interface FileTreeNodeProps {
+  item: FileNode
+  onDownload: (path: string) => void
+  onDelete: (path: string) => void
+  level?: number
+}
+
+const formatFileSize = (bytes?: number): string => {
+  if (!bytes || bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const formatDate = (dateString?: string): string => {
+  if (!dateString) return '--'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(true)
-  
+
   if (!item) {
     return null
-  }
-  
-  const formatFileSize = (bytes) => {
-    if (!bytes || bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '--'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    })
   }
 
   const handleToggle = () => {
@@ -33,10 +41,10 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
   }
 
   const handleDelete = () => {
-    const message = item.type === 'directory' 
+    const message = item.type === 'directory'
       ? `确定要删除文件夹 "${item.name}" 及其所有内容吗？此操作不可撤销。`
       : `确定要删除文件 "${item.name}" 吗？此操作不可撤销。`
-    
+
     if (confirm(message)) {
       onDelete(item.path)
     }
@@ -44,13 +52,13 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
 
   const getFileIcon = () => {
     if (item.type === 'directory') {
-      return isExpanded ? 
-        <FolderOpen className="h-5 w-5 text-blue-500" /> : 
+      return isExpanded ?
+        <FolderOpen className="h-5 w-5 text-blue-500" /> :
         <Folder className="h-5 w-5 text-blue-500" />
     }
-    
+
     const extension = item.name?.split('.').pop()?.toLowerCase() || ''
-    
+
     switch (extension) {
       case 'pdf':
         return <div className="file-icon-pdf">PDF</div>
@@ -94,14 +102,14 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
   return (
     <div>
       {/* 当前节点 - 表格行样式 */}
-      <div 
+      <div
         className="flex items-center hover:bg-gray-50 transition-colors group"
         style={{ paddingLeft: `${level * 1.5 + 1}rem` }}
       >
         {/* 文件名列 */}
         <div className="flex items-center space-x-3 flex-1 min-w-0 py-4 pr-4">
           <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" />
-          
+
           {/* 展开/折叠图标 */}
           {item.type === 'directory' ? (
             <button
@@ -117,12 +125,12 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
           ) : (
             <div className="w-6"></div>
           )}
-          
+
           {/* 文件/文件夹图标 */}
           <div className="flex-shrink-0">
             {getFileIcon()}
           </div>
-          
+
           {/* 文件/文件夹名称 */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
@@ -130,28 +138,28 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
             </p>
           </div>
         </div>
-        
+
         {/* 文件大小列 */}
         <div className="w-24 text-right pr-8">
           <span className="text-sm text-gray-600">
             {item.type === 'file' && item.size ? formatFileSize(item.size) : '--'}
           </span>
         </div>
-        
+
         {/* 上传日期列 */}
         <div className="w-28 text-right pr-8">
           <span className="text-sm text-gray-600">
             {formatDate(item.uploadTime)}
           </span>
         </div>
-        
+
         {/* 最后更新列 */}
         <div className="w-28 text-right pr-8">
           <span className="text-sm text-gray-600">
             {formatDate(item.modifyTime || item.uploadTime)}
           </span>
         </div>
-        
+
         {/* 上传者列 */}
         <div className="w-32 text-right pr-8">
           <div className="flex items-center justify-end space-x-2">
@@ -161,7 +169,7 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
             <span className="text-sm text-gray-600">用户</span>
           </div>
         </div>
-        
+
         {/* 操作列 */}
         <div className="w-20 text-right">
           <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -190,7 +198,7 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
           </div>
         </div>
       </div>
-      
+
       {/* 子节点 */}
       {item.type === 'directory' && isExpanded && item.children && item.children.length > 0 && (
         <div>
@@ -209,7 +217,13 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }) => {
   )
 }
 
-const FileTree = ({ files, onDownload, onDelete }) => {
+interface FileTreeProps {
+  files: FileNode[]
+  onDownload: (path: string) => void
+  onDelete: (path: string) => void
+}
+
+const FileTree = ({ files, onDownload, onDelete }: FileTreeProps) => {
   if (!files || files.length === 0) {
     return (
       <div className="text-center text-gray-500 py-12">

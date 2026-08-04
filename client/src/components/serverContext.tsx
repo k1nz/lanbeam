@@ -1,8 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { getCurrentServerUrl, discoverServer } from '../config/api'
 import { useToast } from './Toast'
 
-const ServerContext = createContext()
+export type ServerStatus = 'pending' | 'ready' | 'failed'
+
+export interface RefreshResult {
+  found: boolean
+  portChanged: boolean
+}
+
+interface ServerContextValue {
+  serverUrl: string
+  serverReady: ServerStatus
+  refreshServer: () => Promise<RefreshResult>
+}
+
+const ServerContext = createContext<ServerContextValue | null>(null)
 
 export const useServer = () => {
   const context = useContext(ServerContext)
@@ -12,14 +25,14 @@ export const useServer = () => {
   return context
 }
 
-export const ServerProvider = ({ children }) => {
-  const [serverUrl, setServerUrl] = useState(getCurrentServerUrl())
-  const [serverReady, setServerReady] = useState('pending') // 'pending', 'ready', 'failed'
+export const ServerProvider = ({ children }: { children: ReactNode }) => {
+  const [serverUrl, setServerUrl] = useState<string>(getCurrentServerUrl())
+  const [serverReady, setServerReady] = useState<ServerStatus>('pending') // 'pending', 'ready', 'failed'
   const { showToast } = useToast()
 
   // 发现服务器并更新状态
   // 返回 { found, portChanged }，由调用方决定如何提示
-  const refreshServer = useCallback(async () => {
+  const refreshServer = useCallback(async (): Promise<RefreshResult> => {
     const beforeUrl = getCurrentServerUrl()
     setServerReady('pending')
 

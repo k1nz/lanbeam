@@ -2,15 +2,26 @@
 export const DEFAULT_SERVER_PORT = 3001;
 
 // 获取默认服务器地址
-const getDefaultServerUrl = () => {
+const getDefaultServerUrl = (): string => {
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   const port = import.meta.env.VITE_SERVER_PORT || String(DEFAULT_SERVER_PORT);
   return `${protocol}//${hostname}:${port}`;
 };
 
+export interface ApiConfig {
+  baseURL: string;
+  endpoints: {
+    upload: string;
+    files: string;
+    download: string;
+    delete: string;
+    checkFiles: string;
+  };
+}
+
 // API 配置
-const getServerUrl = () => {
+const getServerUrl = (): string => {
   // 1. 用户手动保存的地址优先（最明确的连接意图）
   const savedServerUrl = localStorage.getItem('serverUrl');
   if (savedServerUrl) {
@@ -26,7 +37,7 @@ const getServerUrl = () => {
   return getDefaultServerUrl();
 };
 
-export const API_CONFIG = {
+export const API_CONFIG: ApiConfig = {
   baseURL: getServerUrl(),
   endpoints: {
     upload: '/api/upload',
@@ -38,24 +49,24 @@ export const API_CONFIG = {
 };
 
 // 更新服务器地址
-export const updateServerUrl = (url) => {
+export const updateServerUrl = (url: string): void => {
   localStorage.setItem('serverUrl', url);
   API_CONFIG.baseURL = url;
 };
 
 // 获取当前服务器地址
-export const getCurrentServerUrl = () => {
+export const getCurrentServerUrl = (): string => {
   return API_CONFIG.baseURL;
 };
 
 // 重置为默认地址
-export const resetServerUrl = () => {
+export const resetServerUrl = (): void => {
   localStorage.removeItem('serverUrl');
   API_CONFIG.baseURL = getDefaultServerUrl();
 };
 
 // 从服务器地址中提取主机名
-const getHostnameFromUrl = (url) => {
+const getHostnameFromUrl = (url: string): string | null => {
   try {
     return new URL(url).hostname;
   } catch (e) {
@@ -64,7 +75,7 @@ const getHostnameFromUrl = (url) => {
 };
 
 // 探测某个地址是否是文件传输服务器
-const probeServer = async (url, timeoutMs = 800) => {
+const probeServer = async (url: string, timeoutMs = 800): Promise<boolean> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -82,7 +93,7 @@ const probeServer = async (url, timeoutMs = 800) => {
 
 // 扫描端口，查找实际运行的文件传输服务器
 // 找到则更新内存中的连接地址，返回 true；未找到返回 false
-export const discoverServer = async (fromPort = DEFAULT_SERVER_PORT, toPort = 3020) => {
+export const discoverServer = async (fromPort = DEFAULT_SERVER_PORT, toPort = 3020): Promise<boolean> => {
   const startUrl = getCurrentServerUrl();
   const hostname = getHostnameFromUrl(startUrl);
   if (!hostname) return false;
@@ -94,7 +105,7 @@ export const discoverServer = async (fromPort = DEFAULT_SERVER_PORT, toPort = 30
 
   // 扫描端口范围（并行探测，避免串行等待超时）
   const baseUrl = new URL(startUrl);
-  const probes = [];
+  const probes: { port: number; origin: string }[] = [];
   for (let port = fromPort; port <= toPort; port++) {
     const probeUrl = new URL(baseUrl);
     probeUrl.port = String(port);

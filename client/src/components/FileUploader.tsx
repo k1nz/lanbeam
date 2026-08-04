@@ -1,40 +1,51 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef, type ChangeEvent, type DragEvent, type InputHTMLAttributes } from 'react'
 import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useToast } from './Toast'
 import { API_CONFIG } from '../config/api'
 import ConflictModal from './ConflictModal'
+import type { SelectedFile } from '../types'
 
-const FileUploader = ({ onUploadSuccess }) => {
+interface UploadResponse {
+  success: boolean
+  message?: string
+  files?: unknown[]
+}
+
+interface FileUploaderProps {
+  onUploadSuccess?: () => void
+}
+
+const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
   const [isDragOver, setIsDragOver] = useState(false)
-  const [selectedFiles, setSelectedFiles] = useState([])
-  const [uploadProgress, setUploadProgress] = useState({})
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([])
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({})
   const [isUploading, setIsUploading] = useState(false)
-  const [uploadMode, setUploadMode] = useState('files') // 'files' or 'folder'
+  const [uploadMode, setUploadMode] = useState<'files' | 'folder'>('files')
   const [showConflictModal, setShowConflictModal] = useState(false)
-  const [conflicts, setConflicts] = useState([])
-  const [pendingUpload, setPendingUpload] = useState(null)
-  const fileInputRef = useRef(null)
-  const folderInputRef = useRef(null)
+  const [conflicts, setConflicts] = useState<string[]>([])
+  const [pendingUpload, setPendingUpload] = useState<SelectedFile[] | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const folderInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragOver(true)
   }
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragOver(false)
   }
 
   // 递归读取文件夹内容
-  const readDirectoryRecursively = async (entry, path = '') => {
-    const files = []
-    
+  const readDirectoryRecursively = async (entry: FileSystemEntry, path = ''): Promise<File[]> => {
+    const files: File[] = []
+
     if (entry.isFile) {
-      return new Promise((resolve) => {
-        entry.file((file) => {
+      return new Promise<File[]>((resolve) => {
+        (entry as FileSystemFileEntry).file((file) => {
           // 设置文件的相对路径
           Object.defineProperty(file, 'webkitRelativePath', {
             value: path + file.name,
@@ -44,27 +55,27 @@ const FileUploader = ({ onUploadSuccess }) => {
         })
       })
     } else if (entry.isDirectory) {
-      const dirReader = entry.createReader()
-      const entries = await new Promise((resolve) => {
-        dirReader.readEntries(resolve)
+      const dirReader = (entry as FileSystemDirectoryEntry).createReader()
+      const entries = await new Promise<FileSystemEntry[]>((resolve) => {
+        dirReader.readEntries((children) => resolve(children))
       })
-      
+
       for (const childEntry of entries) {
         const childFiles = await readDirectoryRecursively(childEntry, path + entry.name + '/')
         files.push(...childFiles)
       }
     }
-    
+
     return files
   }
 
-  const handleDrop = async (e) => {
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragOver(false)
-    
+
     const items = Array.from(e.dataTransfer.items)
-    const allFiles = []
-    
+    const allFiles: File[] = []
+
     // 处理拖拽的项目（可能包含文件和文件夹）
     for (const item of items) {
       if (item.kind === 'file') {
@@ -84,16 +95,16 @@ const FileUploader = ({ onUploadSuccess }) => {
         }
       }
     }
-    
+
     // 如果没有通过 webkitGetAsEntry 获取到文件，回退到传统方式
     if (allFiles.length === 0) {
       const files = Array.from(e.dataTransfer.files)
       allFiles.push(...files)
     }
-    
+
     if (allFiles.length > 0) {
       addFiles(allFiles)
-      
+
       // 检查是否包含文件夹
       const hasFolderFiles = allFiles.some(file => file.webkitRelativePath && file.webkitRelativePath.includes('/'))
       if (hasFolderFiles) {
@@ -106,13 +117,13 @@ const FileUploader = ({ onUploadSuccess }) => {
     }
   }
 
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files)
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : []
     addFiles(files)
   }
 
-  const addFiles = (files) => {
-    const newFiles = files.map(file => ({
+  const addFiles = (files: File[]) => {
+    const newFiles: SelectedFile[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       file,
       status: 'pending', // pending, uploading, success, error
@@ -121,7 +132,7 @@ const FileUploader = ({ onUploadSuccess }) => {
     setSelectedFiles(prev => [...prev, ...newFiles])
   }
 
-  const removeFile = (fileId) => {
+  const removeFile = (fileId: string) => {
     setSelectedFiles(prev => prev.filter(f => f.id !== fileId))
     setUploadProgress(prev => {
       const newProgress = { ...prev }
@@ -130,7 +141,7 @@ const FileUploader = ({ onUploadSuccess }) => {
     })
   }
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
@@ -139,13 +150,13 @@ const FileUploader = ({ onUploadSuccess }) => {
   }
 
   // 检查文件冲突
-  const checkConflicts = async (files) => {
+  const checkConflicts = async (files: SelectedFile[]): Promise<string[]> => {
     try {
       const fileNames = files.map(fileItem => fileItem.relativePath || fileItem.file.name)
-      const response = await axios.post(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.checkFiles}`, {
+      const response = await axios.post<{ success: boolean; conflicts: string[] }>(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.checkFiles}`, {
         fileNames
       })
-      
+
       if (response.data.success) {
         return response.data.conflicts || []
       }
@@ -157,10 +168,10 @@ const FileUploader = ({ onUploadSuccess }) => {
   }
 
   // 执行实际上传
-  const performUpload = async (filesToUpload) => {
+  const performUpload = async (filesToUpload: SelectedFile[]) => {
     setIsUploading(true)
     const formData = new FormData()
-    
+
     // 添加文件和路径信息
     filesToUpload.forEach((fileItem, index) => {
       formData.append('files', fileItem.file)
@@ -171,17 +182,18 @@ const FileUploader = ({ onUploadSuccess }) => {
     })
 
     try {
-      const response = await axios.post(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.upload}`, formData, {
+      const response = await axios.post<UploadResponse>(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.upload}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
         onUploadProgress: (progressEvent) => {
+          const total = progressEvent.total ?? 1
           const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
+            (progressEvent.loaded * 100) / total
           )
-          
+
           // 为所有文件设置相同的进度
-          const newProgress = {}
+          const newProgress: Record<string, number> = {}
           filesToUpload.forEach(fileItem => {
             newProgress[fileItem.id] = percentCompleted
           })
@@ -191,10 +203,10 @@ const FileUploader = ({ onUploadSuccess }) => {
 
       if (response.data.success) {
         // 标记所有文件为成功
-        setSelectedFiles(prev => 
+        setSelectedFiles(prev =>
           prev.map(fileItem => ({ ...fileItem, status: 'success' }))
         )
-        
+
         showToast({
           title: '上传成功',
           description: `成功上传 ${filesToUpload.length} 个文件`,
@@ -210,15 +222,16 @@ const FileUploader = ({ onUploadSuccess }) => {
       }
     } catch (error) {
       console.error('上传失败:', error)
-      
+
       // 标记所有文件为错误
-      setSelectedFiles(prev => 
+      setSelectedFiles(prev =>
         prev.map(fileItem => ({ ...fileItem, status: 'error' }))
       )
-      
+
+      const message = (error as AxiosError<{ message?: string }>).response?.data?.message
       showToast({
         title: '上传失败',
-        description: error.response?.data?.message || '文件上传时发生错误',
+        description: message || '文件上传时发生错误',
         type: 'error'
       })
     } finally {
@@ -231,7 +244,7 @@ const FileUploader = ({ onUploadSuccess }) => {
 
     // 检查文件冲突
     const conflictFiles = await checkConflicts(selectedFiles)
-    
+
     if (conflictFiles.length > 0) {
       // 有冲突，显示确认对话框
       setConflicts(conflictFiles)
@@ -260,7 +273,7 @@ const FileUploader = ({ onUploadSuccess }) => {
     setConflicts([])
   }
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: SelectedFile['status']) => {
     switch (status) {
       case 'success':
         return <CheckCircle className="h-4 w-4 text-green-500" />
@@ -271,6 +284,9 @@ const FileUploader = ({ onUploadSuccess }) => {
     }
   }
 
+  // webkitdirectory 不是 React 标准属性，用类型化展开传入
+  const folderInputProps = { webkitdirectory: '' } as InputHTMLAttributes<HTMLInputElement>
+
   return (
     <div className="space-y-4">
       {/* 冲突确认模态框 */}
@@ -280,7 +296,7 @@ const FileUploader = ({ onUploadSuccess }) => {
         onCancel={handleConflictCancel}
         isVisible={showConflictModal}
       />
-      
+
       {/* 上传模式选择 */}
       <div className="flex items-center justify-center gap-6 mb-4">
         <label className="flex items-center cursor-pointer">
@@ -288,7 +304,7 @@ const FileUploader = ({ onUploadSuccess }) => {
             type="radio"
             value="files"
             checked={uploadMode === 'files'}
-            onChange={(e) => setUploadMode(e.target.value)}
+            onChange={(e) => setUploadMode(e.target.value as 'files' | 'folder')}
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">选择文件</span>
@@ -298,7 +314,7 @@ const FileUploader = ({ onUploadSuccess }) => {
             type="radio"
             value="folder"
             checked={uploadMode === 'folder'}
-            onChange={(e) => setUploadMode(e.target.value)}
+            onChange={(e) => setUploadMode(e.target.value as 'files' | 'folder')}
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">选择文件夹</span>
@@ -309,8 +325,8 @@ const FileUploader = ({ onUploadSuccess }) => {
       <div
         className={`
           border-2 border-dashed rounded-lg transition-all duration-200 cursor-pointer
-          ${isDragOver 
-            ? 'border-blue-400 bg-blue-50/50' 
+          ${isDragOver
+            ? 'border-blue-400 bg-blue-50/50'
             : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/30'
           }
         `}
@@ -339,7 +355,7 @@ const FileUploader = ({ onUploadSuccess }) => {
             或拖拽{uploadMode === 'files' ? '文件' : '文件夹'}到此处
           </p>
         </div>
-        
+
         <input
           ref={fileInputRef}
           type="file"
@@ -351,7 +367,7 @@ const FileUploader = ({ onUploadSuccess }) => {
           ref={folderInputRef}
           type="file"
           multiple
-          webkitdirectory=""
+          {...folderInputProps}
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -374,9 +390,9 @@ const FileUploader = ({ onUploadSuccess }) => {
               </button>
             </div>
           </div>
-          
+
           <div className="divide-y divide-gray-200">
-            {selectedFiles.map((fileItem, index) => (
+            {selectedFiles.map((fileItem) => (
               <div
                 key={fileItem.id}
                 className="px-6 py-4 hover:bg-gray-50 transition-colors"
@@ -398,7 +414,7 @@ const FileUploader = ({ onUploadSuccess }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4">
                     {/* 进度条 */}
                     {uploadProgress[fileItem.id] !== undefined && (
@@ -415,7 +431,7 @@ const FileUploader = ({ onUploadSuccess }) => {
                         </div>
                       </div>
                     )}
-                    
+
                     {!isUploading && fileItem.status === 'pending' && (
                       <button
                         onClick={() => removeFile(fileItem.id)}

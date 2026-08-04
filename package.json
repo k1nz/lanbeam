@@ -5,22 +5,30 @@
   "private": true,
   "packageManager": "pnpm@8.15.0",
   "scripts": {
-    "dev": "pnpm --parallel --filter server --filter client run dev --host",
+    "dev": "pnpm -r --parallel --filter server --filter client run dev --host",
     "dev:server": "pnpm --filter server run dev",
     "dev:client": "pnpm --filter client run dev",
-    "build": "pnpm --filter client run build",
+    "build": "pnpm --filter client run build && pnpm --filter server run build",
     "start": "pnpm --filter server run start",
     "clean": "pnpm --recursive run clean",
+    "typecheck": "pnpm --filter server run typecheck && pnpm --filter client run typecheck && tsgo --noEmit -p tsconfig.json",
     "lint": "pnpm --recursive run lint",
     "install:all": "pnpm install",
-    "network": "node scripts/network-info.js",
-    "network:info": "node scripts/network-info.js"
+    "network": "tsgo -p tsconfig.json && node dist/scripts/network-info.js",
+    "network:info": "tsgo -p tsconfig.json && node dist/scripts/network-info.js"
   },
-  "keywords": ["file-transfer", "nodejs", "react", "upload", "monorepo"],
+  "keywords": [
+    "file-transfer",
+    "nodejs",
+    "react",
+    "upload",
+    "monorepo"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "typescript": "^5.3.0"
   },
   "engines": {

@@ -1,13 +1,21 @@
 import { useEffect } from 'react'
 import { Copy, Trash2, X } from 'lucide-react'
+import type { SharedImage } from '../types'
+
+interface ImageLightboxProps {
+  image: SharedImage | null
+  onClose: () => void
+  onCopy: () => void
+  onDelete: (id: string) => void
+}
 
 /**
  * 图片预览弹层：点击遮罩、关闭按钮或 Esc 均可关闭。
  * image: { id, blobUrl, timestamp }，blobUrl 为空时显示加载占位。
  */
-export default function ImageLightbox({ image, onClose, onCopy, onDelete }) {
+export default function ImageLightbox({ image, onClose, onCopy, onDelete }: ImageLightboxProps) {
   useEffect(() => {
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKey)

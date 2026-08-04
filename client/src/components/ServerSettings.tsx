@@ -1,26 +1,32 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Settings, Check, X, RotateCcw, Wifi, WifiOff, Search } from 'lucide-react'
 import { getCurrentServerUrl, updateServerUrl, resetServerUrl } from '../config/api'
 import { useServer } from './serverContext'
 import { useToast } from './Toast'
 
-const ServerSettings = ({ onServerChange }) => {
+type ConnectionStatus = 'unknown' | 'connected' | 'disconnected'
+
+interface ServerSettingsProps {
+  onServerChange: () => void
+}
+
+const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [serverUrl, setServerUrl] = useState(getCurrentServerUrl())
   const [isConnecting, setIsConnecting] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState('unknown') // 'connected', 'disconnected', 'unknown'
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('unknown')
   const { showToast } = useToast()
   const { refreshServer } = useServer()
 
   // 测试服务器连接
-  const testConnection = async (url) => {
+  const testConnection = async (url: string): Promise<boolean> => {
     setIsConnecting(true)
     try {
       const response = await fetch(`${url}/`, {
         method: 'GET',
-        timeout: 5000
+        signal: AbortSignal.timeout(5000)
       })
-      
+
       if (response.ok) {
         setConnectionStatus('connected')
         return true
@@ -56,20 +62,20 @@ const ServerSettings = ({ onServerChange }) => {
 
     // 测试连接
     const isConnected = await testConnection(formattedUrl)
-    
+
     if (isConnected) {
       updateServerUrl(formattedUrl)
       setServerUrl(formattedUrl)
       setIsOpen(false)
-      
+
       showToast({
         title: '设置已保存',
         description: `服务器地址已更新为: ${formattedUrl}`,
         type: 'success'
       })
-      
+
       // 通知父组件服务器地址已更改
-      onServerChange && onServerChange()
+      onServerChange()
     } else {
       showToast({
         title: '连接失败',
@@ -82,7 +88,6 @@ const ServerSettings = ({ onServerChange }) => {
   // 自动检测服务器（服务器可能因端口被占用而切换到其他端口）
   const handleAutoDetect = async () => {
     setIsConnecting(true)
-    const beforeUrl = getCurrentServerUrl()
 
     try {
       const { found, portChanged } = await refreshServer()
@@ -98,7 +103,7 @@ const ServerSettings = ({ onServerChange }) => {
             : `服务器连接正常: ${afterUrl}`,
           type: 'success'
         })
-        onServerChange && onServerChange()
+        onServerChange()
       } else {
         setConnectionStatus('disconnected')
         showToast({
@@ -125,14 +130,14 @@ const ServerSettings = ({ onServerChange }) => {
     resetServerUrl()
     setServerUrl(getCurrentServerUrl())
     setConnectionStatus('unknown')
-    
+
     showToast({
       title: '设置已重置',
       description: '服务器地址已重置为默认值',
       type: 'success'
     })
-    
-    onServerChange && onServerChange()
+
+    onServerChange()
   }
 
   // 取消更改
@@ -146,7 +151,7 @@ const ServerSettings = ({ onServerChange }) => {
     if (isConnecting) {
       return <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
     }
-    
+
     switch (connectionStatus) {
       case 'connected':
         return <Wifi className="h-4 w-4 text-green-500" />
@@ -159,7 +164,7 @@ const ServerSettings = ({ onServerChange }) => {
 
   const getConnectionText = () => {
     if (isConnecting) return '连接中...'
-    
+
     switch (connectionStatus) {
       case 'connected':
         return '已连接'
@@ -192,7 +197,7 @@ const ServerSettings = ({ onServerChange }) => {
             <h3 className="text-lg font-medium text-gray-800 mb-4">
               服务器设置
             </h3>
-            
+
             <div className="space-y-4">
               {/* 当前服务器地址显示 */}
               <div>
@@ -253,7 +258,7 @@ const ServerSettings = ({ onServerChange }) => {
                   <RotateCcw className="h-3 w-3" />
                   <span>重置</span>
                 </button>
-                
+
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={handleCancel}
