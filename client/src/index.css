@@ -5,24 +5,24 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 9%;
     --radius: 0.5rem;
   }
 }
@@ -33,7 +33,12 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: "Geist Sans", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv03";
+  }
+
+  button, input, textarea {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2;
   }
 }
 
@@ -43,22 +48,22 @@
   }
   
   .file-icon-pdf {
-    @apply w-6 h-6 bg-red-100 rounded text-red-600 flex items-center justify-center text-xs font-bold;
+    @apply w-7 h-7 bg-gray-100 border border-gray-200 rounded text-gray-700 flex items-center justify-center text-[9px] font-semibold;
   }
   
   .file-icon-image {
-    @apply w-6 h-6 bg-green-100 rounded text-green-600 flex items-center justify-center text-xs font-bold;
+    @apply w-7 h-7 bg-gray-100 border border-gray-200 rounded text-gray-700 flex items-center justify-center text-[9px] font-semibold;
   }
   
   .file-icon-video {
-    @apply w-6 h-6 bg-purple-100 rounded text-purple-600 flex items-center justify-center text-xs font-bold;
+    @apply w-7 h-7 bg-gray-100 border border-gray-200 rounded text-gray-700 flex items-center justify-center text-[9px] font-semibold;
   }
   
   .file-icon-design {
-    @apply w-6 h-6 bg-pink-100 rounded text-pink-600 flex items-center justify-center text-xs font-bold;
+    @apply w-7 h-7 bg-gray-100 border border-gray-200 rounded text-gray-700 flex items-center justify-center text-[9px] font-semibold;
   }
   
   .file-icon-document {
-    @apply w-6 h-6 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold;
+    @apply w-7 h-7 bg-gray-100 border border-gray-200 rounded text-gray-700 flex items-center justify-center text-[9px] font-semibold;
   }
 }

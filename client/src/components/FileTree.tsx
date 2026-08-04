@@ -53,8 +53,8 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
   const getFileIcon = () => {
     if (item.type === 'directory') {
       return isExpanded ?
-        <FolderOpen className="h-5 w-5 text-blue-500" /> :
-        <Folder className="h-5 w-5 text-blue-500" />
+        <FolderOpen className="h-5 w-5 text-gray-700" /> :
+        <Folder className="h-5 w-5 text-gray-700" />
     }
 
     const extension = item.name?.split('.').pop()?.toLowerCase() || ''
@@ -103,18 +103,19 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
     <div>
       {/* 当前节点 - 表格行样式 */}
       <div
-        className="flex items-center hover:bg-gray-50 transition-colors group"
+        className="group flex min-w-[720px] items-center transition-colors hover:bg-gray-50"
         style={{ paddingLeft: `${level * 1.5 + 1}rem` }}
       >
         {/* 文件名列 */}
-        <div className="flex items-center space-x-3 flex-1 min-w-0 py-4 pr-4">
-          <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+        <div className="flex min-w-0 flex-1 items-center space-x-3 py-3 pr-4">
+          <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-gray-950 focus:ring-gray-950" aria-label={`选择 ${item.name}`} />
 
           {/* 展开/折叠图标 */}
           {item.type === 'directory' ? (
             <button
               onClick={handleToggle}
-              className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-gray-200"
+              aria-label={isExpanded ? `折叠 ${item.name}` : `展开 ${item.name}`}
             >
               {isExpanded ? (
                 <ChevronDown className="h-4 w-4 text-gray-500" />
@@ -123,7 +124,7 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
               )}
             </button>
           ) : (
-            <div className="w-6"></div>
+            <div className="w-7"></div>
           )}
 
           {/* 文件/文件夹图标 */}
@@ -163,7 +164,7 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
         {/* 上传者列 */}
         <div className="w-32 text-right pr-8">
           <div className="flex items-center justify-end space-x-2">
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-950 text-xs font-medium text-white">
               U
             </div>
             <span className="text-sm text-gray-600">用户</span>
@@ -176,7 +177,7 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
             {item.type === 'file' && (
               <button
                 onClick={() => onDownload(item.path)}
-                className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-950"
                 title="下载"
               >
                 <Download className="h-4 w-4" />
@@ -184,13 +185,13 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
             )}
             <button
               onClick={handleDelete}
-              className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
               title="删除"
             >
               <Trash2 className="h-4 w-4" />
             </button>
             <button
-              className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-950"
               title="更多选项"
             >
               <MoreHorizontal className="h-4 w-4" />

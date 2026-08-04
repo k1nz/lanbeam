@@ -149,7 +149,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
 
   const getConnectionIcon = () => {
     if (isConnecting) {
-      return <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+      return <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-950 border-t-transparent"></div>
     }
 
     switch (connectionStatus) {
@@ -183,18 +183,18 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
           setServerUrl(getCurrentServerUrl())
           setIsOpen(!isOpen)
         }}
-        className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-950"
         title="服务器设置"
+        aria-label="服务器设置"
       >
-        <Settings className="h-4 w-4" />
-        <span>服务器设置</span>
+        <Settings className="h-5 w-5" />
       </button>
 
       {/* 设置面板 */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
-          <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">
+        <div className="absolute top-full right-0 z-50 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-xl">
+          <div className="p-5">
+            <h3 className="mb-4 text-base font-semibold text-gray-950">
               服务器设置
             </h3>
 
@@ -204,7 +204,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   当前服务器地址
                 </label>
-                <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded border">
+                <div className="rounded-md border border-gray-200 bg-gray-50 p-2 font-mono text-xs text-gray-600">
                   {getCurrentServerUrl()}
                 </div>
               </div>
@@ -219,7 +219,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
                   placeholder={getCurrentServerUrl()}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   示例: http://192.168.1.100:3001
@@ -231,7 +231,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
                 <button
                   onClick={() => testConnection(serverUrl)}
                   disabled={isConnecting}
-                  className="flex items-center space-x-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                  className="flex items-center space-x-2 px-2 py-1 text-sm text-gray-700 hover:text-gray-950 disabled:text-gray-400"
                 >
                   {getConnectionIcon()}
                   <span>{getConnectionText()}</span>
@@ -240,7 +240,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
                 <button
                   onClick={handleAutoDetect}
                   disabled={isConnecting}
-                  className="flex items-center space-x-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                  className="flex items-center space-x-1 px-2 py-1 text-sm text-gray-700 hover:text-gray-950 disabled:text-gray-400"
                   title="自动扫描端口，查找文件传输服务器"
                 >
                   <Search className="h-3 w-3" />
@@ -269,7 +269,7 @@ const ServerSettings = ({ onServerChange }: ServerSettingsProps) => {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                  className="flex items-center space-x-1 rounded-md bg-gray-950 px-3 py-1.5 text-sm text-white transition-colors hover:bg-gray-800"
                   >
                     <Check className="h-3 w-3" />
                     <span>保存</span>

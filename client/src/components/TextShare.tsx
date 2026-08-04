@@ -281,41 +281,41 @@ export default function TextShare() {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
+    <div className="rounded-lg border border-gray-200 bg-white">
+      <div className="flex flex-col gap-3 border-b border-gray-200 px-5 py-4 sm:flex-row sm:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-semibold text-gray-900">实时文本共享</h2>
+            <h2 className="text-base font-semibold text-gray-900">文本共享</h2>
             {connected ? (
-              <span className="inline-flex items-center text-xs text-green-600">
-                <Wifi className="h-3 w-3 mr-1" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                <Wifi className="h-3 w-3" />
                 已连接
               </span>
             ) : (
-              <span className="inline-flex items-center text-xs text-red-500">
-                <WifiOff className="h-3 w-3 mr-1" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                <WifiOff className="h-3 w-3" />
                 未连接
               </span>
             )}
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-1">
             <button
               onClick={handleCopy}
-              className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 flex items-center space-x-1"
+              className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
             >
               <Copy className="h-4 w-4" />
               <span>复制</span>
             </button>
             <button
               onClick={handleClear}
-              className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 flex items-center space-x-1"
+              className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
             >
               <Trash2 className="h-4 w-4" />
               <span>清空</span>
             </button>
             <button
               onClick={clearAll}
-              className="text-sm text-gray-500 hover:text-red-600 px-2 py-1 rounded hover:bg-gray-100 flex items-center space-x-1"
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
             >
               <Trash2 className="h-4 w-4" />
               <span>清空全部</span>
@@ -324,10 +324,10 @@ export default function TextShare() {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-5 sm:p-6">
         {/* 文本区 */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <p className="text-sm text-gray-500">
               在此输入文本，同一网络下的其他设备将实时看到您输入的内容。
             </p>
@@ -339,12 +339,12 @@ export default function TextShare() {
             onPaste={handlePaste}
             placeholder="在此输入文本，Ctrl+V 可直接粘贴图片..."
             rows={8}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+            className="min-h-[220px] w-full resize-y rounded-md border border-gray-200 px-3 py-3 text-sm leading-6 placeholder:text-gray-400 focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
           />
           <div className="mt-2 flex justify-between text-xs text-gray-400">
             <span>{text.length} 个字符</span>
             {!connected && (
-              <button onClick={connect} className="text-blue-500 hover:text-blue-600">
+              <button onClick={connect} className="font-medium text-gray-950 underline underline-offset-4">
                 重新连接
               </button>
             )}
@@ -355,21 +355,21 @@ export default function TextShare() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
-              <ImageIcon className="h-4 w-4 text-gray-500" />
+              <ImageIcon className="h-4 w-4 text-gray-500" aria-hidden="true" />
               <h3 className="text-sm font-medium text-gray-700">共享图片</h3>
               <span className="text-xs text-gray-400">
                 {images.length > 0 ? `${images.length} 张` : ''}
               </span>
             </div>
-            <span className="inline-flex items-center text-xs text-gray-400">
-              <ClipboardPaste className="h-3 w-3 mr-1" />
+            <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+              <ClipboardPaste className="h-3 w-3" aria-hidden="true" />
               在文本框中粘贴图片即可共享
             </span>
           </div>
 
           {images.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-lg py-8 flex flex-col items-center justify-center">
-              <ClipboardPaste className="h-8 w-8 text-gray-300 mb-2" />
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 py-10">
+              <ClipboardPaste className="mb-2 h-7 w-7 text-gray-300" />
               <p className="text-sm text-gray-400">暂无图片，在文本框中粘贴即可实时共享</p>
             </div>
           ) : (
@@ -393,7 +393,7 @@ export default function TextShare() {
                     </button>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
+                    <div className="animate-spin h-6 w-6 rounded-full border-2 border-gray-950 border-t-transparent" />
                     </div>
                   )}
 
@@ -404,7 +404,7 @@ export default function TextShare() {
                         e.stopPropagation()
                         copyImageToClipboard(img.id)
                       }}
-                      className="p-1.5 bg-black/50 hover:bg-blue-600 text-white rounded-full transition-colors"
+                      className="rounded-md border border-gray-200 bg-white/95 p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
                       title="复制图片"
                     >
                       <Copy className="h-3.5 w-3.5" />
@@ -414,7 +414,7 @@ export default function TextShare() {
                         e.stopPropagation()
                         handleRemoveImage(img.id)
                       }}
-                      className="p-1.5 bg-black/50 hover:bg-red-600 text-white rounded-full transition-colors"
+                      className="rounded-md border border-gray-200 bg-white/95 p-2 text-gray-700 shadow-sm transition-colors hover:bg-red-50 hover:text-red-600"
                       title="删除图片"
                     >
                       <X className="h-3.5 w-3.5" />

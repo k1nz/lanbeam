@@ -1,5 +1,5 @@
 import { useState, useRef, type ChangeEvent, type DragEvent, type InputHTMLAttributes } from 'react'
-import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, File, Folder, X, CheckCircle, AlertCircle } from 'lucide-react'
 import axios, { AxiosError } from 'axios'
 import { useToast } from './Toast'
 import { API_CONFIG } from '../config/api'
@@ -305,7 +305,7 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
             value="files"
             checked={uploadMode === 'files'}
             onChange={(e) => setUploadMode(e.target.value as 'files' | 'folder')}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+            className="h-4 w-4 text-gray-950 focus:ring-gray-950 border-gray-300"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">选择文件</span>
         </label>
@@ -315,7 +315,7 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
             value="folder"
             checked={uploadMode === 'folder'}
             onChange={(e) => setUploadMode(e.target.value as 'files' | 'folder')}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+            className="h-4 w-4 text-gray-950 focus:ring-gray-950 border-gray-300"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">选择文件夹</span>
         </label>
@@ -324,10 +324,10 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
       {/* 拖拽上传区域 */}
       <div
         className={`
-          border-2 border-dashed rounded-lg transition-all duration-200 cursor-pointer
+          border border-dashed rounded-lg transition-all duration-200 cursor-pointer
           ${isDragOver
-            ? 'border-blue-400 bg-blue-50/50'
-            : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/30'
+            ? 'border-gray-950 bg-gray-50'
+            : 'border-gray-300 hover:border-gray-950 hover:bg-gray-50'
           }
         `}
         onDragOver={handleDragOver}
@@ -341,18 +341,18 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
           }
         }}
       >
-        <div className="p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-            <Upload className="h-8 w-8 text-blue-600" />
+        <div className="p-8 text-center sm:p-10">
+          <div className="w-12 h-12 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
+            <Upload className="h-5 w-5 text-gray-700" />
           </div>
           <button
             type="button"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors mb-2"
+            className="bg-gray-950 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors mb-2"
           >
             {uploadMode === 'files' ? '选择文件' : '选择文件夹'}
           </button>
           <p className="text-sm text-gray-500">
-            或拖拽{uploadMode === 'files' ? '文件' : '文件夹'}到此处
+            或拖拽{uploadMode === 'files' ? '文件' : '文件夹'}到此处 · 单文件最大 200MB
           </p>
         </div>
 
@@ -384,7 +384,7 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
               <button
                 onClick={uploadFiles}
                 disabled={isUploading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
+                className="bg-gray-950 hover:bg-gray-800 disabled:bg-gray-300 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:cursor-not-allowed"
               >
                 {isUploading ? '上传中...' : '开始上传'}
               </button>
@@ -409,7 +409,10 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
                       <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
                         <span>{formatFileSize(fileItem.file.size)}</span>
                         {fileItem.relativePath && fileItem.relativePath !== fileItem.file.name && (
-                          <span className="text-blue-600 font-medium">📁 文件夹上传</span>
+                          <span className="inline-flex items-center gap-1 font-medium text-gray-600">
+                            <Folder className="h-3.5 w-3.5" />
+                            文件夹上传
+                          </span>
                         )}
                       </div>
                     </div>
@@ -423,9 +426,9 @@ const FileUploader = ({ onUploadSuccess }: FileUploaderProps) => {
                           <span>进度</span>
                           <span>{uploadProgress[fileItem.id]}%</span>
                         </div>
-                        <div className="bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-200 rounded-full h-1.5">
                           <div
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            className="bg-gray-950 h-1.5 rounded-full transition-all duration-300"
                             style={{ width: `${uploadProgress[fileItem.id]}%` }}
                           ></div>
                         </div>
