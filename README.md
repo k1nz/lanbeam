@@ -1,168 +1,115 @@
-# 文件传输系统
+# 📂 文件传输助手
 
-一个基于 Node.js 和 React 的现代化文件传输系统，使用 pnpm workspace 管理的 monorepo 架构。
+一个轻量级的局域网文件传输工具，基于 Node.js 和 React 构建。无需注册登录，同一网络下的电脑、手机、平板打开浏览器即可互相传输文件、实时共享文本和图片。
 
-## 功能特性
+## ✨ 功能特性
 
-- 🚀 Node.js + Express 服务端
-- ⚛️ React + Vite 客户端
-- 📁 拖拽文件上传
-- 💾 本地文件存储
-- 🎨 现代化用户界面
-- 📦 pnpm workspace monorepo 架构
-- 🌏 中文文件名支持
-- 🔧 动态服务器地址配置
-- 🌐 局域网访问支持
+**📁 文件传输**
+- 拖拽或点击上传文件，支持上传整个文件夹
+- 目录树形式浏览已上传文件，支持下载与删除
+- 正确处理中文文件名，不再出现乱码
+- 上传时自动检测同名冲突，避免误覆盖
 
-## 技术栈
+**💬 实时文本共享**
+- 基于 WebSocket 实时同步，输入即所见
+- 同一网络下的所有设备同步显示内容
+- 新加入的设备自动获取当前共享内容
 
-- **包管理器**: pnpm (workspace)
-- **服务端**: Node.js, Express, Multer
-- **客户端**: React, Vite, Tailwind CSS, Lucide React
-- **开发工具**: nodemon, ESLint
+**🖼️ 实时图片共享**
+- 在文本框中直接按 `Ctrl+V` 粘贴图片即可实时共享
+- 支持点击放大预览、复制图片、删除图片
+- 内存保留最近 20 张图片，单张不超过 10MB
 
-## 项目结构
+**🌐 局域网访问**
+- 手机、平板连接同一 WiFi 即可访问
+- 服务器自动发现：自动探测 3001–3020 端口
+- 一键复制分享链接，发送给其他设备即可打开
 
-```
-file-transfer/                    # Monorepo 根目录
-├── pnpm-workspace.yaml          # pnpm workspace 配置
-├── .npmrc                       # pnpm 配置
-├── server/                      # @file-transfer/server
-│   ├── src/
-│   │   └── index.js            # Express 服务器
-│   ├── uploads/                # 文件存储目录
-│   └── package.json
-├── client/                     # @file-transfer/client
-│   ├── src/
-│   │   ├── components/         # React 组件
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── public/
-│   └── package.json
-└── package.json               # 根目录配置
-```
+**⚙️ 灵活配置**
+- 可动态配置服务器地址，支持局域网与远程服务器
+- 可自定义文件大小限制（默认 100MB）
+- 端口被占用时自动递增切换
 
-## 结构图
-```mermaid
-graph TD
-    A["🏠 file-transfer<br/>(monorepo root)"] --> B["📦 pnpm-workspace.yaml"]
-    A --> C["⚙️ .npmrc"]
-    A --> D["📄 package.json<br/>(workspace scripts)"]
-    
-    A --> E["🖥️ server/<br/>@file-transfer/server"]
-    A --> F["🌐 client/<br/>@file-transfer/client"]
-    
-    E --> G["📡 Express + Multer<br/>(file upload API)"]
-    E --> H["📁 uploads/<br/>(file storage)"]
-    
-    F --> I["⚛️ React + Vite<br/>(frontend app)"]
-    F --> J["🎨 Tailwind + Lucide<br/>(UI components)"]
-    
-    K["👤 Developer"] --> L["pnpm dev"]
-    L --> M["🔄 Parallel startup"]
-    M --> N["Server :3001"]
-    M --> O["Client :3000"]
-    
-    P["📱 User"] --> Q["Drag & Drop Files"]
-    Q --> R["Upload to Server"]
-    R --> S["Store in uploads/"]
-    
-    style A fill:#e1f5fe
-    style E fill:#f3e5f5
-    style F fill:#e8f5e8
-    style K fill:#fff3e0
-    style P fill:#fce4ec
-```
+## 🚀 快速开始
 
-## 快速开始
+### 环境要求
 
-### 前置要求
-- Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- Node.js ≥ 18
+- pnpm ≥ 8
 
-### 安装依赖
+### 安装与启动
+
 ```bash
+# 安装依赖
 pnpm install
-```
 
-### 开发模式
-同时启动服务端和客户端：
-```bash
+# 同时启动服务端和客户端
 pnpm dev
 ```
 
-### 单独运行
-启动服务端：
+启动后打开浏览器访问：
+
+| 入口 | 地址 |
+| --- | --- |
+| 客户端界面 | http://localhost:3000 |
+| 服务端 API | http://localhost:3001 |
+
+### 生产构建
+
 ```bash
-pnpm dev:server
+pnpm build        # 构建客户端
+pnpm start        # 启动服务端
 ```
 
-启动客户端：
+## 📖 使用指南
+
+### 传输文件
+
+1. 打开「文件传输」标签页
+2. 点击上传区域或直接拖拽文件 / 文件夹
+3. 上传完成后，可在「附加文件」列表中浏览、下载或删除
+
+### 实时共享文本与图片
+
+1. 切换到「文本共享」标签页
+2. 输入文本，其他设备实时同步
+3. 在文本框中粘贴图片，即可共享给所有人
+
+### 服务器设置
+
+点击右上角的服务器设置图标，可配置要连接的服务器地址（支持局域网或远程服务器），设置会自动保存，下次打开无需重新配置。
+
+### 分享给其他设备
+
+点击右上角的分享按钮，复制页面链接，将链接发送给同一网络下的其他设备，对方浏览器打开即可使用。
+
+## 📱 手机访问
+
+1. 确保手机与电脑连接**同一个 WiFi**
+2. 查看电脑的局域网 IP（运行 `pnpm network` 即可显示）
+3. 手机浏览器访问 `http://<电脑IP>:3000`
+4. 若提示未连接服务器，在「服务器设置」中填写 `http://<电脑IP>:3001`
+
+## ⚙️ 常用配置
+
+### 自定义文件大小限制
+
+默认最大 **100MB**，可通过启动参数修改：
+
 ```bash
-pnpm dev:client
+# 使用命令行参数（单位为 MB）
+node server/src/index.js --max-size 200
+
+# 或使用环境变量
+MAX_FILE_SIZE=200 pnpm dev:server
 ```
 
-### 构建生产版本
-```bash
-pnpm build
-```
+## 🛠️ 技术栈
 
-### 其他命令
-清理所有构建产物：
-```bash
-pnpm clean
-```
+- **前端**：React + Vite + Tailwind CSS
+- **后端**：Node.js + Express + Multer
+- **实时通信**：WebSocket（ws）
 
-运行 linting：
-```bash
-pnpm lint
-```
+## 📄 许可证
 
-查看网络配置信息：
-```bash
-pnpm network
-```
-
-## 访问地址
-
-- 客户端：http://localhost:3000
-- 服务端 API：http://localhost:3001
-
-## 🆕 新功能
-
-### 中文文件名支持
-现在可以正确处理包含中文字符的文件名，不会出现乱码问题。
-
-### 动态服务器配置
-- 点击右上角的"服务器设置"可以配置连接的服务器地址
-- 支持连接到局域网或远程服务器
-- 自动保存设置到本地存储
-- 实时连接状态检测
-
-#### 配置示例：
-```bash
-# 连接到局域网服务器
-http://192.168.1.100:3001
-
-# 连接到远程服务器  
-https://your-server.com:3001
-```
-
-### 局域网访问支持
-服务器现在支持局域网访问，其他设备可以通过局域网 IP 连接：
-
-1. **查看网络信息**：
-   ```bash
-   pnpm network
-   ```
-
-2. **局域网访问示例**：
-   - 服务器：`http://192.168.1.100:3001`
-   - 客户端：`http://192.168.1.100:3000`
-
-3. **移动设备访问**：
-   - 连接到同一 WiFi
-   - 浏览器访问局域网地址
-   - 配置服务器地址
-
-详细配置请参考 [局域网部署指南](./NETWORK.md)
+[MIT](./LICENSE)
