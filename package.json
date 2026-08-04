@@ -1,14 +1,24 @@
 {
-  "name": "file-transfer-system",
+  "name": "lanbeam",
   "version": "1.0.0",
-  "description": "一个基于 Node.js 和 React 的文件传输系统",
-  "private": true,
+  "description": "A local-first LAN file transfer and real-time sharing tool",
+  "bin": {
+    "lanbeam": "./bin/lanbeam.js"
+  },
+  "files": [
+    "bin",
+    "client/dist",
+    "server/dist",
+    "README.md",
+    "LICENSE"
+  ],
   "packageManager": "pnpm@8.15.0",
   "scripts": {
     "dev": "pnpm -r --parallel --filter server --filter client run dev --host",
     "dev:server": "pnpm --filter server run dev",
     "dev:client": "pnpm --filter client run dev",
     "build": "pnpm --filter client run build && pnpm --filter server run build",
+    "prepack": "pnpm build",
     "start": "pnpm --filter server run start",
     "clean": "pnpm --recursive run clean",
     "typecheck": "pnpm --filter server run typecheck && pnpm --filter client run typecheck && tsgo --noEmit -p tsconfig.json",
@@ -24,8 +34,14 @@
     "upload",
     "monorepo"
   ],
-  "author": "Your Name",
+  "author": "k1nz",
   "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "ws": "^8.21.0"
+  },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
