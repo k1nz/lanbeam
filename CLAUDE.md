@@ -64,3 +64,22 @@ Key gotchas:
 - UI copy is Simplified Chinese; code comments are Chinese.
 - Prefer lucide-react icons over hand-rolled SVGs in client components.
 - Any column/size change in the file table must stay in sync between `App.tsx` (header) and `FileTree.tsx` (rows).
+
+## Product direction: npm CLI package
+
+The planned public product name is **LanBeam**:
+
+- npm package name: `lanbeam`
+- global installation: `npm i -g lanbeam`
+- startup command: `lanbeam`
+
+LanBeam should be distributed as a single npm package, similar to `http-server`. The global command must start the local server and client together, so users do not need to know the monorepo layout or run separate development commands. The package should include the built client assets and server runtime, preserve the existing local-first/LAN-only workflow, and continue to expose the actual server port when automatic port incrementing is needed.
+
+When implementing this direction:
+
+- Add a Node.js CLI entry point exposed through the package's `bin` field.
+- Build/package the client and server artifacts as part of the release flow.
+- Make `lanbeam` start both runtime pieces and report the URL that users should open.
+- Keep the existing development commands (`pnpm dev`, `pnpm dev:server`, and `pnpm dev:client`) for repository development.
+- Treat `lanbeam` as the public product command; package metadata, README examples, and help output should use this name consistently.
+- `lanbeam` was selected after checking the current npm registry during planning; verify availability again before publishing and reserve the name if necessary.

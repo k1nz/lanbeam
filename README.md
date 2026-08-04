@@ -72,6 +72,10 @@
 ### 安装与启动 / Install & Run
 
 ```bash
+# 全局安装并启动（推荐）/ Install globally and start
+npm i -g lanbeam
+lanbeam
+
 # 安装依赖 / Install dependencies
 pnpm install
 
@@ -79,12 +83,26 @@ pnpm install
 pnpm dev
 ```
 
-启动后打开浏览器访问 / Once running, open your browser at:
+使用 `lanbeam` 后，打开终端显示的地址即可。默认地址为 `http://localhost:3001`，同一局域网内的设备可通过终端显示的局域网地址访问。上传文件会保存到执行命令时当前目录的 `lanbeam-files/`。
+
+After running `lanbeam`, open the URL printed in the terminal. The default is `http://localhost:3001`; devices on the same LAN can use the printed LAN URL. Uploaded files are stored in `lanbeam-files/` within the directory where you run the command.
+
+本地开发时启动后打开浏览器访问 / When developing locally, open:
 
 | 入口 / Entry | 地址 / Address |
 | --- | --- |
 | 客户端界面 / Client UI | http://localhost:3000 |
 | 服务端 API / Server API | http://localhost:3001 |
+
+### CLI 参数 / CLI Options
+
+```bash
+# 指定端口 / Set the port
+lanbeam --port 8080
+
+# 设置单文件最大大小（MB）/ Set the max single-file size in MB
+lanbeam --max-size 500
+```
 
 ### 生产构建 / Production Build
 
