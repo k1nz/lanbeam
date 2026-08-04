@@ -3,10 +3,11 @@ import FileUploader from './components/FileUploader'
 import FileList from './components/FileList'
 import TextShare from './components/TextShare'
 import ServerSettings from './components/ServerSettings'
+import ShareButton from './components/ShareButton'
 import { ToastProvider } from './components/Toast'
 import { ServerProvider, useServer } from './components/serverContext'
 import { useState } from 'react'
-import { FolderOpen, Upload, Server, Share2, MoreHorizontal, FileText } from 'lucide-react'
+import { FolderOpen, Upload, Server, FileText, File } from 'lucide-react'
 
 function AppContent() {
   const [refreshFiles, setRefreshFiles] = useState(0)
@@ -36,9 +37,7 @@ function AppContent() {
               </div> */}
             </div>
             <div className="flex items-center space-x-4">
-              <button className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
-                <Share2 className="h-5 w-5" />
-              </button>
+              <ShareButton />
               <ServerSettings onServerChange={handleServerChange} />
             </div>
           </div>
@@ -92,7 +91,8 @@ function AppContent() {
                 <div className="px-6 py-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-gray-900">附加文件</h2>
-                    <div className="flex items-center space-x-2">
+                    {/* 右侧操作按钮暂不启用，注释保留待后续功能完善后再放开 */}
+                    {/* <div className="flex items-center space-x-2">
                       <button className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded border-b-2 border-transparent hover:border-gray-300">
                         查看全部
                       </button>
@@ -105,7 +105,7 @@ function AppContent() {
                       <button className="text-gray-400 hover:text-gray-600 p-1 rounded">
                         <MoreHorizontal className="h-5 w-5" />
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -117,17 +117,33 @@ function AppContent() {
                   </div>
 
                   <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <div className="bg-gray-50 pl-4 py-3 border-b border-gray-200">
                       <div className="flex items-center justify-between text-sm font-medium text-gray-700">
-                        <div className="flex items-center space-x-4">
-                          <input type="checkbox" className="rounded border-gray-300" />
-                          <span>文件名</span>
+                        {/* 文件名列：结构镜像 FileTree 行（复选框+展开占位+文件图标，含 pr-4），使表头文字与行内文件名对齐 */}
+                        <div className="flex items-center space-x-3 flex-1 min-w-0 pr-4">
+                          <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+                          <div className="w-6"></div>
+                          <div className="flex-shrink-0">
+                            <File className="h-5 w-5 text-transparent" />
+                          </div>
+                          <span className="flex-1 min-w-0 truncate">文件名</span>
                         </div>
-                        <div className="grid grid-cols-4 gap-8 text-right">
-                          <span>文件大小</span>
-                          <span>上传日期</span>
-                          <span>最后更新</span>
-                          <span>上传者</span>
+                        {/* 右侧列宽与 FileTree 行保持一致（含行末操作列占位），保证表头与内容对齐 */}
+                        <div className="flex items-center flex-shrink-0">
+                          <div className="w-24 text-right pr-8">
+                            <span>文件大小</span>
+                          </div>
+                          <div className="w-28 text-right pr-8">
+                            <span>上传日期</span>
+                          </div>
+                          <div className="w-28 text-right pr-8">
+                            <span>最后更新</span>
+                          </div>
+                          <div className="w-32 text-right pr-8">
+                            <span>上传者</span>
+                          </div>
+                          {/* 行末操作列（下载/删除/更多）占位，宽度与表格行一致 */}
+                          <div className="w-20"></div>
                         </div>
                       </div>
                     </div>
