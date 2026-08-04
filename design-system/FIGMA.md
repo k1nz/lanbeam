@@ -28,16 +28,13 @@ Create a new Design file named **File Transfer — Design System**, then:
 
 ## Visual reference (HTML artboards)
 
-Open locally:
-
 ```bash
-# from repo root
-python3 -m http.server 8765 --directory design-system/preview
-# then visit http://localhost:8765/
+python3 -m http.server 8765 --directory design-system
+# Design system → http://localhost:8765/preview/index.html
+# Desktop screens → http://localhost:8765/preview/screens.html
 ```
 
-- `index.html` — Design System page (tokens + components)
-- `screens.html` — Desktop core screens + overlays
+PNG exports live in `preview/exports/` (tokens, files empty/populated, text share, conflict/share/settings overlays).
 
 These artboards match the planned Figma frames and can be pasted into Figma via **screenshot → place**, or rebuilt with Variables + components using this doc as the checklist.
 
