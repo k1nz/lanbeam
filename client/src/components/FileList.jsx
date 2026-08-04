@@ -3,6 +3,7 @@ import { RefreshCw, FolderOpen } from 'lucide-react'
 import axios from 'axios'
 import { useToast } from './Toast'
 import { API_CONFIG } from '../config/api'
+import { useServer } from './serverContext'
 import FileTree from './FileTree'
 
 const FileList = ({ refreshTrigger }) => {
@@ -10,13 +11,14 @@ const FileList = ({ refreshTrigger }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { showToast } = useToast()
+  const { serverReady } = useServer()
 
   const fetchFiles = async () => {
     try {
       setLoading(true)
       setError(null)
       const response = await axios.get(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.files}`)
-      
+
       if (response.data.success) {
         setFiles(response.data.files || [])
       } else {
@@ -31,8 +33,11 @@ const FileList = ({ refreshTrigger }) => {
   }
 
   useEffect(() => {
-    fetchFiles()
-  }, [refreshTrigger])
+    // 等待服务器地址发现完成后再加载，避免请求到旧的端口
+    if (serverReady === 'ready') {
+      fetchFiles()
+    }
+  }, [refreshTrigger, serverReady])
 
 
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Settings, Check, X, RotateCcw, Wifi, WifiOff } from 'lucide-react'
+import { Settings, Check, X, RotateCcw, Wifi, WifiOff, Search } from 'lucide-react'
 import { getCurrentServerUrl, updateServerUrl, resetServerUrl } from '../config/api'
+import { useServer } from './serverContext'
 import { useToast } from './Toast'
 
 const ServerSettings = ({ onServerChange }) => {
@@ -9,6 +10,7 @@ const ServerSettings = ({ onServerChange }) => {
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('unknown') // 'connected', 'disconnected', 'unknown'
   const { showToast } = useToast()
+  const { refreshServer } = useServer()
 
   // 测试服务器连接
   const testConnection = async (url) => {
@@ -77,10 +79,51 @@ const ServerSettings = ({ onServerChange }) => {
     }
   }
 
+  // 自动检测服务器（服务器可能因端口被占用而切换到其他端口）
+  const handleAutoDetect = async () => {
+    setIsConnecting(true)
+    const beforeUrl = getCurrentServerUrl()
+
+    try {
+      const { found, portChanged } = await refreshServer()
+      const afterUrl = getCurrentServerUrl()
+
+      if (found) {
+        setServerUrl(afterUrl)
+        setConnectionStatus('connected')
+        showToast({
+          title: '已找到服务器',
+          description: portChanged
+            ? `端口已变化，自动切换到 ${afterUrl}`
+            : `服务器连接正常: ${afterUrl}`,
+          type: 'success'
+        })
+        onServerChange && onServerChange()
+      } else {
+        setConnectionStatus('disconnected')
+        showToast({
+          title: '未找到服务器',
+          description: `扫描端口 ${3001}-${3020} 未发现文件传输服务器，请确认服务器已启动`,
+          type: 'error'
+        })
+      }
+    } catch (error) {
+      console.error('自动检测失败:', error)
+      setConnectionStatus('disconnected')
+      showToast({
+        title: '自动检测失败',
+        description: '扫描过程中发生错误，请稍后重试',
+        type: 'error'
+      })
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
   // 重置为默认设置
   const handleReset = () => {
     resetServerUrl()
-    setServerUrl('http://localhost:3001')
+    setServerUrl(getCurrentServerUrl())
     setConnectionStatus('unknown')
     
     showToast({
@@ -131,7 +174,10 @@ const ServerSettings = ({ onServerChange }) => {
     <div className="relative">
       {/* 设置按钮 */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setServerUrl(getCurrentServerUrl())
+          setIsOpen(!isOpen)
+        }}
         className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
         title="服务器设置"
       >
@@ -167,7 +213,7 @@ const ServerSettings = ({ onServerChange }) => {
                   type="text"
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
-                  placeholder="http://localhost:3001"
+                  placeholder={getCurrentServerUrl()}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -184,6 +230,16 @@ const ServerSettings = ({ onServerChange }) => {
                 >
                   {getConnectionIcon()}
                   <span>{getConnectionText()}</span>
+                </button>
+
+                <button
+                  onClick={handleAutoDetect}
+                  disabled={isConnecting}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                  title="自动扫描端口，查找文件传输服务器"
+                >
+                  <Search className="h-3 w-3" />
+                  <span>自动检测</span>
                 </button>
               </div>
 

@@ -15,26 +15,115 @@ const server = http.createServer(app);
 // WebSocket 服务
 const wss = new WebSocketServer({ server });
 
+// ws 会把 http server 的错误转发到 wss，必须有监听器兜底，
+// 否则 EADDRINUSE 会先在这里抛出，导致端口重试逻辑无法执行
+wss.on('error', (err) => {
+    if (err.code !== 'EADDRINUSE') {
+        console.error('WebSocket 服务器错误:', err);
+    }
+});
+
 // 共享文本状态
 let sharedText = '';
+// 共享图片列表（每条带唯一 id 与上传时间，限制条数与单张大小，防止内存无限增长）
+let sharedImages = [];
+let imageIdCount = 0;
+const MAX_IMAGES = 20;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 单张 10MB
+
+// 向其他客户端广播 JSON 消息
+const broadcastJSON = (ws, payload) => {
+    wss.clients.forEach((client) => {
+        if (client !== ws && client.readyState === 1) {
+            client.send(payload);
+        }
+    });
+};
+
+// 生成二进制帧：2 字节头部长度 + JSON 头（仅元数据）+ 图片字节
+const buildImageFrame = (id, timestamp, mimeType, data) => {
+    const header = JSON.stringify({
+        type: 'image-add-binary',
+        image: { id, timestamp, mimeType }
+    });
+    const headerBuf = Buffer.from(header);
+    const lenBuf = Buffer.alloc(2);
+    lenBuf.writeUInt16BE(headerBuf.length);
+    return Buffer.concat([lenBuf, headerBuf, data]);
+};
+
+// 解析二进制帧，返回 { header, imageBytes }
+const parseImageFrame = (buf) => {
+    const headerLen = buf.readUInt16BE(0);
+    const header = JSON.parse(buf.slice(2, 2 + headerLen).toString());
+    const imageBytes = buf.subarray(2 + headerLen);
+    return { header, imageBytes };
+};
+
+// 发送完整状态（文本 + 图片元数据），随后逐个发送图片二进制数据
+const sendFullState = (ws) => {
+    ws.send(JSON.stringify({
+        type: 'text-state',
+        text: sharedText,
+        images: sharedImages.map(({ id, timestamp }) => ({ id, timestamp }))
+    }));
+    sharedImages.forEach((image) => {
+        ws.send(buildImageFrame(image.id, image.timestamp, image.mimeType, image.data));
+    });
+};
+
+// 在内存中保留最近的图片（同 id 覆盖，防止重复；data 仅用于新连接重放）
+const keepImage = (id, timestamp, mimeType, data) => {
+    sharedImages = sharedImages.filter((img) => img.id !== id);
+    sharedImages.push({ id, timestamp, mimeType, data });
+    if (sharedImages.length > MAX_IMAGES) {
+        sharedImages.splice(0, sharedImages.length - MAX_IMAGES);
+    }
+};
 
 wss.on('connection', (ws) => {
     console.log('🔗 新客户端已连接到文本共享');
 
-    // 发送当前文本状态给新客户端
-    ws.send(JSON.stringify({ type: 'text-state', text: sharedText }));
+    // 发送当前文本和图片状态给新客户端
+    sendFullState(ws);
 
-    ws.on('message', (data) => {
+    ws.on('message', (data, isBinary) => {
+        // 图片以二进制帧传输（客户端本地已有字节，服务器转发即可，无需额外存储）
+        if (isBinary) {
+            const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+            try {
+                const { header, imageBytes } = parseImageFrame(buf);
+                if (header.type === 'image-add-binary') {
+                    if (imageBytes.length > MAX_IMAGE_BYTES) {
+                        console.warn(`⚠️  图片过大被拒绝: ${(imageBytes.length / 1024 / 1024).toFixed(2)}MB`);
+                        return;
+                    }
+                    const { id, mimeType } = header.image;
+                    const timestamp = new Date().toISOString();
+                    keepImage(id, timestamp, mimeType, imageBytes);
+                    // 广播给所有其他客户端（重新组装，头部只含元数据）
+                    broadcastJSON(ws, buildImageFrame(id, timestamp, mimeType, imageBytes));
+                }
+            } catch (e) {
+                console.error('WebSocket 图片消息解析错误:', e);
+            }
+            return;
+        }
+
         try {
             const message = JSON.parse(data.toString());
             if (message.type === 'text-update') {
                 sharedText = message.text;
                 // 广播给所有其他客户端
-                wss.clients.forEach((client) => {
-                    if (client !== ws && client.readyState === 1) {
-                        client.send(JSON.stringify({ type: 'text-update', text: sharedText }));
-                    }
-                });
+                broadcastJSON(ws, JSON.stringify({ type: 'text-update', text: sharedText }));
+            } else if (message.type === 'image-delete') {
+                const id = message.id;
+                const removed = sharedImages.find((img) => img.id === id);
+                if (removed) {
+                    // 从内存中移除，避免被后续连接的新客户端重放
+                    sharedImages = sharedImages.filter((img) => img.id !== id);
+                }
+                broadcastJSON(ws, JSON.stringify({ type: 'image-delete', id }));
             }
         } catch (e) {
             console.error('WebSocket 消息解析错误:', e);
@@ -138,6 +227,7 @@ app.get('/', (req, res) => {
     res.json({
         message: '文件传输服务器运行中',
         version: '1.0.0',
+        port: server.address().port,
         endpoints: {
             upload: 'POST /api/upload',
             files: 'GET /api/files',
@@ -448,26 +538,51 @@ const getLocalIPAddress = () => {
 };
 
 // 启动服务器 - 监听所有网络接口
-server.listen(PORT, '0.0.0.0', () => {
+// 端口被占用时自动递增重试（最多尝试 20 个端口）
+const MAX_PORT_ATTEMPTS = 20;
+let currentPort = PORT;
+let attempts = 0;
+
+const tryListen = () => {
+    server.once('error', (err) => {
+        if (err.code === 'EADDRINUSE' && attempts < MAX_PORT_ATTEMPTS) {
+            const oldPort = currentPort;
+            currentPort++;
+            attempts++;
+            console.log(`⚠️  端口 ${oldPort} 已被占用，尝试切换到端口 ${currentPort}...`);
+            tryListen();
+        } else {
+            console.error(`❌ 无法监听端口 ${currentPort}${err.code === 'EADDRINUSE' ? `（已尝试 ${MAX_PORT_ATTEMPTS} 个端口）` : ''}:`, err.message);
+            process.exit(1);
+        }
+    });
+
+    server.listen(currentPort, '0.0.0.0');
+};
+
+server.on('listening', () => {
     const localIPs = getLocalIPAddress();
-    
+
     console.log(`🚀 文件传输服务器已启动`);
     console.log(`📁 文件存储目录: ${uploadDir}`);
     console.log(`📏 文件大小限制: ${maxFileSize}MB`);
+    if (currentPort !== PORT) {
+        console.log(`🔀 端口 ${PORT} 被占用，实际监听端口: ${currentPort}`);
+    }
     console.log(`\n🌐 访问地址:`);
-    console.log(`   本地访问: http://localhost:${PORT}`);
-    console.log(`   本地访问: http://127.0.0.1:${PORT}`);
-    
+    console.log(`   本地访问: http://localhost:${currentPort}`);
+    console.log(`   本地访问: http://127.0.0.1:${currentPort}`);
+
     if (localIPs.length > 0) {
         console.log(`\n🔗 局域网访问:`);
         localIPs.forEach(ip => {
-            console.log(`   http://${ip}:${PORT}`);
+            console.log(`   http://${ip}:${currentPort}`);
         });
         console.log(`\n💡 其他设备可以通过上述局域网地址访问文件传输服务`);
     } else {
         console.log(`\n⚠️  未检测到局域网 IP 地址`);
     }
-    
+
     console.log(`\n📋 API 端点:`);
     console.log(`   GET  /              - 服务器信息`);
     console.log(`   POST /api/upload    - 文件上传`);
@@ -478,3 +593,5 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`   --max-size <MB>     - 设置文件大小限制 (当前: ${maxFileSize}MB)`);
     console.log(`   例如: node index.js --max-size 200`);
 });
+
+tryListen();

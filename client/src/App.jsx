@@ -4,13 +4,14 @@ import FileList from './components/FileList'
 import TextShare from './components/TextShare'
 import ServerSettings from './components/ServerSettings'
 import { ToastProvider } from './components/Toast'
+import { ServerProvider, useServer } from './components/serverContext'
 import { useState } from 'react'
-import { getCurrentServerUrl } from './config/api'
-import { FolderOpen, Upload, Server, Users, Share2, MoreHorizontal, Settings, FileText } from 'lucide-react'
+import { FolderOpen, Upload, Server, Share2, MoreHorizontal, FileText } from 'lucide-react'
 
-function App() {
+function AppContent() {
   const [refreshFiles, setRefreshFiles] = useState(0)
   const [activeTab, setActiveTab] = useState('files') // 'files', 'text'
+  const { serverUrl } = useServer()
 
   const handleUploadSuccess = () => {
     setRefreshFiles(prev => prev + 1)
@@ -21,8 +22,7 @@ function App() {
   }
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         {/* 顶部导航栏 */}
         <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -138,7 +138,7 @@ function App() {
               </div>
             </>
           ) : (
-            <TextShare />
+            <TextShare key={serverUrl} />
           )}
 
           {/* 服务器状态信息 */}
@@ -147,12 +147,21 @@ function App() {
               <Server className="h-5 w-5 text-blue-600" />
               <div>
                 <p className="text-sm font-medium text-blue-900">连接状态</p>
-                <p className="text-sm text-blue-700">已连接到: {getCurrentServerUrl()}</p>
+                <p className="text-sm text-blue-700">已连接到: {serverUrl}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+  )
+}
+
+function App() {
+  return (
+    <ToastProvider>
+      <ServerProvider>
+        <AppContent />
+      </ServerProvider>
     </ToastProvider>
   )
 }
