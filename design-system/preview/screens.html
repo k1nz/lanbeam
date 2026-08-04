@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>File Transfer — Desktop Screens</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="canvas">
+    <div class="canvas-title">File Transfer — Desktop · 1440 · Core flows</div>
+
+    <!-- FILES EMPTY -->
+    <div class="artboard">
+      <div class="artboard-label">A · Files / Empty</div>
+      <div class="frame frame-1440" id="screen-files-empty">
+        <div class="app">
+          <header class="header">
+            <div class="brand">
+              <div class="brand-mark" aria-hidden="true">
+                <svg class="svg-ico" viewBox="0 0 24 24" style="color:#fafafa"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </div>
+              <h1 class="brand-name">文件传输</h1>
+            </div>
+            <div class="header-actions">
+              <button class="icon-btn" aria-label="分享链接">
+                <svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+              </button>
+              <button class="icon-btn" aria-label="服务器设置">
+                <svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </header>
+          <main class="main">
+            <div class="tabs" role="tablist">
+              <button class="tab" aria-selected="true">
+                <svg class="svg-ico" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                文件传输
+              </button>
+              <button class="tab" aria-selected="false">
+                <svg class="svg-ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                文本共享
+              </button>
+            </div>
+
+            <section class="surface">
+              <div class="surface-bd">
+                <div class="mode-row">
+                  <label class="mode"><input type="radio" checked readOnly /> 选择文件</label>
+                  <label class="mode"><input type="radio" readOnly /> 选择文件夹</label>
+                </div>
+                <div class="dropzone">
+                  <div class="dropzone-icon">
+                    <svg class="svg-ico-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+                  </div>
+                  <h3>点击上传或拖拽文件</h3>
+                  <p class="caption" style="margin:0 0 16px">任意文件类型 · 单文件最大 200MB</p>
+                  <button class="btn btn-primary">选择文件</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-hd">
+                <h2 class="h-title">附加文件</h2>
+              </div>
+              <div class="surface-bd">
+                <p class="muted" style="margin:0 0 16px">已附加到此项目的文件和资源。</p>
+                <div class="table">
+                  <div class="table-head">
+                    <div class="col-name">
+                      <input type="checkbox" aria-label="全选" />
+                      <span style="width:20px"></span>
+                      <span style="width:28px"></span>
+                      <span>文件名</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">文件大小</div>
+                      <div class="w-date">上传日期</div>
+                      <div class="w-date">最后更新</div>
+                      <div class="w-user">上传者</div>
+                      <div class="w-actions"></div>
+                    </div>
+                  </div>
+                  <div class="empty-state">暂无文件。上传后将显示在此处。</div>
+                </div>
+              </div>
+            </section>
+
+            <div class="banner">
+              <svg class="svg-ico-lg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+              <div>
+                <strong>连接状态</strong>
+                <span>已连接到: http://192.168.1.8:3001</span>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILES POPULATED -->
+    <div class="artboard">
+      <div class="artboard-label">B · Files / Populated</div>
+      <div class="frame frame-1440" id="screen-files-populated">
+        <div class="app">
+          <header class="header">
+            <div class="brand">
+              <div class="brand-mark" aria-hidden="true">
+                <svg class="svg-ico" viewBox="0 0 24 24" style="color:#fafafa"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </div>
+              <h1 class="brand-name">文件传输</h1>
+            </div>
+            <div class="header-actions">
+              <button class="icon-btn" aria-label="分享链接"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+              <button class="icon-btn" aria-label="服务器设置"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+            </div>
+          </header>
+          <main class="main">
+            <div class="tabs" role="tablist">
+              <button class="tab" aria-selected="true">文件传输</button>
+              <button class="tab" aria-selected="false">文本共享</button>
+            </div>
+
+            <section class="surface">
+              <div class="surface-bd">
+                <div class="dropzone dropzone-active" style="padding:28px">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+                    <button class="btn btn-primary">选择文件</button>
+                    <span class="caption">拖拽以添加更多文件</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-hd"><h2 class="h-title">附加文件</h2><span class="caption">6 项</span></div>
+              <div class="surface-bd" style="padding-top:0;padding-bottom:0">
+                <div class="table" style="border:none;border-radius:0">
+                  <div class="table-head">
+                    <div class="col-name"><input type="checkbox" /><span style="width:20px"></span><span style="width:28px"></span><span>文件名</span></div>
+                    <div class="cols-meta">
+                      <div class="w-size">文件大小</div>
+                      <div class="w-date">上传日期</div>
+                      <div class="w-date">最后更新</div>
+                      <div class="w-user">上传者</div>
+                      <div class="w-actions"></div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name">
+                      <input type="checkbox" />
+                      <svg class="svg-ico" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                      <svg class="svg-ico-lg" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                      <span>docs</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">—</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions" style="opacity:1">
+                        <button class="icon-btn" aria-label="下载" style="width:32px;height:32px"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></button>
+                        <button class="icon-btn" aria-label="删除" style="width:32px;height:32px"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name indent-1">
+                      <input type="checkbox" />
+                      <span style="width:16px"></span>
+                      <div class="file-chip">PDF</div>
+                      <span>report.pdf</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">2.4 MB</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions" style="opacity:1">
+                        <button class="icon-btn" aria-label="下载" style="width:32px;height:32px"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></button>
+                        <button class="icon-btn" aria-label="删除" style="width:32px;height:32px"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name indent-1">
+                      <input type="checkbox" />
+                      <span style="width:16px"></span>
+                      <div class="file-chip">DOC</div>
+                      <span>meeting-notes.docx</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">186 KB</div>
+                      <div class="w-date">2026/08/03</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions"><button class="icon-btn" aria-label="下载" style="width:32px;height:32px"></button></div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name">
+                      <input type="checkbox" />
+                      <svg class="svg-ico" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                      <svg class="svg-ico-lg" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                      <span>photos</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">—</div>
+                      <div class="w-date">2026/08/02</div>
+                      <div class="w-date">2026/08/04</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions"></div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name indent-1">
+                      <input type="checkbox" />
+                      <span style="width:16px"></span>
+                      <div class="file-chip">IMG</div>
+                      <span>cover.png</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">1.1 MB</div>
+                      <div class="w-date">2026/08/02</div>
+                      <div class="w-date">2026/08/02</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions"></div>
+                    </div>
+                  </div>
+
+                  <div class="table-row">
+                    <div class="col-name">
+                      <input type="checkbox" />
+                      <span style="width:16px"></span>
+                      <div class="file-chip">ZIP</div>
+                      <span>backup.zip</span>
+                    </div>
+                    <div class="cols-meta">
+                      <div class="w-size">48.2 MB</div>
+                      <div class="w-date">2026/08/01</div>
+                      <div class="w-date">2026/08/01</div>
+                      <div class="w-user">用户</div>
+                      <div class="w-actions row-actions"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div class="banner">
+              <svg class="svg-ico-lg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+              <div><strong>连接状态</strong><span>已连接到: http://192.168.1.8:3001</span></div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXT SHARE -->
+    <div class="artboard">
+      <div class="artboard-label">C · Text Share / Connected</div>
+      <div class="frame frame-1440" id="screen-text-share">
+        <div class="app">
+          <header class="header">
+            <div class="brand">
+              <div class="brand-mark" aria-hidden="true">
+                <svg class="svg-ico" viewBox="0 0 24 24" style="color:#fafafa"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </div>
+              <h1 class="brand-name">文件传输</h1>
+            </div>
+            <div class="header-actions">
+              <button class="icon-btn" aria-label="分享链接"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+              <button class="icon-btn" aria-label="服务器设置"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+            </div>
+          </header>
+          <main class="main">
+            <div class="tabs" role="tablist">
+              <button class="tab" aria-selected="false">文件传输</button>
+              <button class="tab" aria-selected="true">文本共享</button>
+            </div>
+
+            <section class="surface">
+              <div class="surface-hd">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <h2 class="h-title">文本共享</h2>
+                  <span class="badge badge-success"><span class="dot"></span>已连接</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-secondary btn-sm">复制文本</button>
+                  <button class="btn btn-secondary btn-sm">清空文本</button>
+                  <button class="btn btn-ghost btn-sm">清空全部</button>
+                </div>
+              </div>
+              <div class="surface-bd">
+                <textarea class="textarea" readonly>今晚 8 点会议室同步进度。
+
+Wi‑Fi：Office-Guest
+密码已在图片里。
+
+Ctrl+V 可粘贴图片，实时同步到同一局域网设备。</textarea>
+                <div style="display:flex;justify-content:space-between;margin-top:8px">
+                  <span class="caption">支持粘贴图片 · 最多 20 张 · 单张 ≤ 10MB</span>
+                  <span class="caption">128 字符</span>
+                </div>
+                <div class="grid-images">
+                  <div class="image-tile" style="background:linear-gradient(145deg,#d4d4d4,#a3a3a3)">
+                    <div class="actions" style="opacity:1">
+                      <button class="icon-btn" aria-label="复制图片"><svg class="svg-ico" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                      <button class="icon-btn" aria-label="删除图片"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                    </div>
+                  </div>
+                  <div class="image-tile" style="background:linear-gradient(145deg,#e5e5e5,#737373)"></div>
+                  <div class="image-tile" style="background:linear-gradient(145deg,#f5f5f5,#d4d4d4)"></div>
+                  <div class="image-tile" style="display:grid;place-items:center;color:#a3a3a3;font-size:12px">加载中…</div>
+                </div>
+              </div>
+            </section>
+
+            <div class="banner">
+              <svg class="svg-ico-lg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>
+              <div><strong>连接状态</strong><span>已连接到: http://192.168.1.8:3001</span></div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERLAYS -->
+    <div class="artboard-row">
+      <div class="artboard">
+        <div class="artboard-label">D · Overlay / Conflict</div>
+        <div class="frame frame-1440" id="screen-conflict" style="min-height:720px">
+          <div class="app" style="min-height:720px;filter:none">
+            <header class="header">
+              <div class="brand"><div class="brand-mark"></div><h1 class="brand-name">文件传输</h1></div>
+            </header>
+            <main class="main"><div class="surface" style="height:280px;opacity:.5"></div></main>
+            <div class="scrim">
+              <div class="modal" role="dialog" aria-modal="true" aria-labelledby="conflict-title">
+                <div class="modal-hd">
+                  <h3 id="conflict-title">
+                    <svg class="svg-ico-lg" viewBox="0 0 24 24" style="color:#d97706"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                    文件名冲突
+                  </h3>
+                  <button class="icon-btn" aria-label="关闭"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                </div>
+                <p class="muted" style="margin:0">以下文件已存在，是否要覆盖？</p>
+                <div class="conflict-list">
+                  <div>• report.pdf</div>
+                  <div>• photos/cover.png</div>
+                  <div>• backup.zip</div>
+                </div>
+                <div class="modal-actions">
+                  <button class="btn btn-secondary">取消</button>
+                  <button class="btn btn-danger">覆盖文件</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="artboard-row">
+      <div class="artboard">
+        <div class="artboard-label">E · Overlay / Share</div>
+        <div class="frame frame-1440" id="screen-share" style="min-height:520px">
+          <div class="app" style="min-height:520px">
+            <header class="header">
+              <div class="brand">
+                <div class="brand-mark"></div>
+                <h1 class="brand-name">文件传输</h1>
+              </div>
+              <div class="header-actions">
+                <button class="icon-btn" aria-label="分享链接" style="background:#f5f5f5;color:#171717">
+                  <svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                </button>
+                <button class="icon-btn" aria-label="服务器设置"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></button>
+              </div>
+            </header>
+            <div class="popover" style="right:120px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3>分享链接</h3>
+                <button class="icon-btn" aria-label="关闭" style="width:28px;height:28px"><svg class="svg-ico" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+              </div>
+              <p>在同一局域网内的其他设备浏览器中打开以下链接，即可访问文件传输助手。</p>
+              <div class="url-row">
+                <div class="url-box">http://192.168.1.8:3000</div>
+                <button class="btn btn-primary btn-sm">复制</button>
+              </div>
+            </div>
+            <main class="main"><div class="surface" style="height:200px;opacity:.35"></div></main>
+          </div>
+        </div>
+      </div>
+
+      <div class="artboard">
+        <div class="artboard-label">F · Overlay / Server Settings</div>
+        <div class="frame frame-1440" id="screen-settings" style="min-height:520px">
+          <div class="app" style="min-height:520px">
+            <header class="header">
+              <div class="brand"><div class="brand-mark"></div><h1 class="brand-name">文件传输</h1></div>
+              <div class="header-actions">
+                <button class="icon-btn" aria-label="分享链接"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+                <button class="icon-btn" aria-label="服务器设置" style="background:#f5f5f5;color:#171717"><svg class="svg-ico-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></button>
+              </div>
+            </header>
+            <div class="popover wide" style="right:72px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <h3>服务器设置</h3>
+                <span class="badge badge-success"><span class="dot"></span>已连接</span>
+              </div>
+              <p>配置后端地址。启动时会自动扫描 3001–3020 端口。</p>
+              <div class="field">
+                <label for="url">服务器地址</label>
+                <input id="url" class="input" value="http://192.168.1.8:3001" />
+              </div>
+              <div class="popover-actions">
+                <button class="btn btn-secondary btn-sm">测试连接</button>
+                <button class="btn btn-secondary btn-sm">自动检测</button>
+                <button class="btn btn-ghost btn-sm">重置</button>
+                <button class="btn btn-primary btn-sm" style="margin-left:auto">保存</button>
+              </div>
+            </div>
+            <main class="main"><div class="surface" style="height:200px;opacity:.35"></div></main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -107,9 +107,9 @@ const FileList = ({ refreshTrigger }: FileListProps) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
+      <div className="bg-white p-8">
         <div className="flex items-center justify-center space-x-2">
-          <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
+          <RefreshCw className="h-5 w-5 animate-spin text-gray-700" />
           <span className="text-gray-600">加载中...</span>
         </div>
       </div>
@@ -118,12 +118,12 @@ const FileList = ({ refreshTrigger }: FileListProps) => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
+      <div className="bg-white p-8">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={fetchFiles}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
+            className="rounded-md bg-gray-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
           >
             重试
           </button>
@@ -136,7 +136,7 @@ const FileList = ({ refreshTrigger }: FileListProps) => {
     return (
       <div className="p-8 text-center">
         <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-          <FolderOpen className="h-8 w-8 text-gray-400" />
+          <FolderOpen className="h-7 w-7 text-gray-400" />
         </div>
         <p className="text-gray-500 mb-2">暂无文件</p>
         <p className="text-sm text-gray-400">上传一些文件开始使用</p>
@@ -158,7 +158,7 @@ const FileList = ({ refreshTrigger }: FileListProps) => {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={fetchFiles}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="rounded-md bg-gray-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
           >
             重试
           </button>

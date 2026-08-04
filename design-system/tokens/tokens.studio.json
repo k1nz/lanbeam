@@ -1,0 +1,115 @@
+{
+  "$themes": [],
+  "$metadata": {
+    "tokenSetOrder": [
+      "global",
+      "semantic"
+    ]
+  },
+  "global": {
+    "color": {
+      "white": { "value": "#FFFFFF", "type": "color" },
+      "black": { "value": "#000000", "type": "color" },
+      "gray": {
+        "50": { "value": "#FAFAFA", "type": "color" },
+        "100": { "value": "#F5F5F5", "type": "color" },
+        "200": { "value": "#E5E5E5", "type": "color" },
+        "300": { "value": "#D4D4D4", "type": "color" },
+        "400": { "value": "#A3A3A3", "type": "color" },
+        "500": { "value": "#737373", "type": "color" },
+        "700": { "value": "#404040", "type": "color" },
+        "900": { "value": "#171717", "type": "color" },
+        "950": { "value": "#0A0A0A", "type": "color" }
+      },
+      "red": {
+        "50": { "value": "#FEF2F2", "type": "color" },
+        "200": { "value": "#FECACA", "type": "color" },
+        "600": { "value": "#DC2626", "type": "color" }
+      },
+      "green": {
+        "50": { "value": "#F0FDF4", "type": "color" },
+        "200": { "value": "#BBF7D0", "type": "color" },
+        "600": { "value": "#16A34A", "type": "color" }
+      },
+      "amber": {
+        "50": { "value": "#FFFBEB", "type": "color" },
+        "200": { "value": "#FDE68A", "type": "color" },
+        "600": { "value": "#D97706", "type": "color" }
+      }
+    },
+    "space": {
+      "1": { "value": "4", "type": "spacing" },
+      "2": { "value": "8", "type": "spacing" },
+      "3": { "value": "12", "type": "spacing" },
+      "4": { "value": "16", "type": "spacing" },
+      "5": { "value": "20", "type": "spacing" },
+      "6": { "value": "24", "type": "spacing" },
+      "8": { "value": "32", "type": "spacing" },
+      "10": { "value": "40", "type": "spacing" },
+      "12": { "value": "48", "type": "spacing" },
+      "16": { "value": "64", "type": "spacing" }
+    },
+    "radius": {
+      "sm": { "value": "4", "type": "borderRadius" },
+      "md": { "value": "6", "type": "borderRadius" },
+      "lg": { "value": "8", "type": "borderRadius" },
+      "xl": { "value": "12", "type": "borderRadius" }
+    },
+    "font": {
+      "sans": { "value": "Geist Sans", "type": "fontFamilies" },
+      "mono": { "value": "Geist Mono", "type": "fontFamilies" },
+      "size": {
+        "caption": { "value": "12", "type": "fontSizes" },
+        "label": { "value": "13", "type": "fontSizes" },
+        "body": { "value": "14", "type": "fontSizes" },
+        "heading": { "value": "16", "type": "fontSizes" },
+        "title": { "value": "20", "type": "fontSizes" },
+        "display": { "value": "32", "type": "fontSizes" }
+      },
+      "weight": {
+        "regular": { "value": "400", "type": "fontWeights" },
+        "medium": { "value": "500", "type": "fontWeights" },
+        "semibold": { "value": "600", "type": "fontWeights" }
+      },
+      "lineHeight": {
+        "caption": { "value": "16", "type": "lineHeights" },
+        "label": { "value": "18", "type": "lineHeights" },
+        "body": { "value": "20", "type": "lineHeights" },
+        "heading": { "value": "24", "type": "lineHeights" },
+        "title": { "value": "28", "type": "lineHeights" },
+        "display": { "value": "40", "type": "lineHeights" }
+      }
+    },
+    "shadow": {
+      "panel": {
+        "value": {
+          "x": "0",
+          "y": "8",
+          "blur": "30",
+          "spread": "0",
+          "color": "#00000014",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow"
+      }
+    }
+  },
+  "semantic": {
+    "color": {
+      "bg": { "value": "{color.white}", "type": "color" },
+      "bg-subtle": { "value": "{color.gray.50}", "type": "color" },
+      "bg-muted": { "value": "{color.gray.100}", "type": "color" },
+      "fg": { "value": "{color.gray.900}", "type": "color" },
+      "fg-muted": { "value": "{color.gray.500}", "type": "color" },
+      "fg-subtle": { "value": "{color.gray.400}", "type": "color" },
+      "border": { "value": "{color.gray.200}", "type": "color" },
+      "border-strong": { "value": "{color.gray.300}", "type": "color" },
+      "primary": { "value": "{color.gray.900}", "type": "color" },
+      "primary-fg": { "value": "{color.gray.50}", "type": "color" },
+      "danger": { "value": "{color.red.600}", "type": "color" },
+      "success": { "value": "{color.green.600}", "type": "color" },
+      "warning": { "value": "{color.amber.600}", "type": "color" },
+      "focus": { "value": "{color.gray.900}", "type": "color" }
+    }
+  }
+}

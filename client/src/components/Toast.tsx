@@ -60,7 +60,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-yellow-500" />
       default:
-        return <AlertCircle className="h-5 w-5 text-blue-500" />
+        return <AlertCircle className="h-5 w-5 text-gray-700" />
     }
   }
 
@@ -73,7 +73,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       case 'warning':
         return 'bg-yellow-50 border-yellow-200'
       default:
-        return 'bg-blue-50 border-blue-200'
+        return 'bg-gray-50 border-gray-200'
     }
   }
 

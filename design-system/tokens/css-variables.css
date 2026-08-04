@@ -1,0 +1,80 @@
+/**
+ * File Transfer — Vercel monochrome tokens
+ * Import into CSS or map to Figma Variables via Tokens Studio.
+ */
+:root {
+  /* Primitive */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-700: #404040;
+  --color-gray-900: #171717;
+  --color-gray-950: #0a0a0a;
+  --color-red-50: #fef2f2;
+  --color-red-200: #fecaca;
+  --color-red-600: #dc2626;
+  --color-green-50: #f0fdf4;
+  --color-green-200: #bbf7d0;
+  --color-green-600: #16a34a;
+  --color-amber-50: #fffbeb;
+  --color-amber-200: #fde68a;
+  --color-amber-600: #d97706;
+
+  /* Semantic */
+  --bg: var(--color-white);
+  --bg-subtle: var(--color-gray-50);
+  --bg-muted: var(--color-gray-100);
+  --fg: var(--color-gray-900);
+  --fg-muted: var(--color-gray-500);
+  --fg-subtle: var(--color-gray-400);
+  --border: var(--color-gray-200);
+  --border-strong: var(--color-gray-300);
+  --primary: var(--color-gray-900);
+  --primary-fg: var(--color-gray-50);
+  --danger: var(--color-red-600);
+  --success: var(--color-green-600);
+  --warning: var(--color-amber-600);
+  --focus: var(--color-gray-900);
+
+  /* Space */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Type */
+  --font-sans: "Geist Sans", "IBM Plex Sans", ui-sans-serif, sans-serif;
+  --font-mono: "Geist Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --text-caption: 12px;
+  --text-label: 13px;
+  --text-body: 14px;
+  --text-heading: 16px;
+  --text-title: 20px;
+  --text-display: 32px;
+
+  /* Elevation */
+  --shadow-panel: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --scrim: rgba(0, 0, 0, 0.4);
+
+  /* Layout */
+  --content-max: 1280px;
+  --page-gutter: 24px;
+  --header-height: 64px;
+}

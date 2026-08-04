@@ -74,7 +74,7 @@ const ShareButton = () => {
       {/* 分享按钮 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-950"
         title="分享链接"
         aria-label="分享链接"
       >
@@ -83,14 +83,15 @@ const ShareButton = () => {
 
       {/* 分享面板 */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
-          <div className="p-4">
+        <div className="absolute top-full right-0 z-50 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-xl">
+          <div className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-medium text-gray-800">分享链接</h3>
+              <h3 className="text-base font-semibold text-gray-950">分享链接</h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 title="关闭"
+                aria-label="关闭分享链接"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -101,12 +102,12 @@ const ShareButton = () => {
             </p>
 
             <div className="flex items-center space-x-2">
-              <div className="flex-1 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-3 py-2 truncate">
+              <div className="flex-1 truncate rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-xs text-gray-700">
                 {shareUrl}
               </div>
               <button
                 onClick={handleCopy}
-                className="flex items-center space-x-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-md transition-colors flex-shrink-0"
+                className="flex flex-shrink-0 items-center space-x-1 rounded-md bg-gray-950 px-3 py-2 text-sm text-white transition-colors hover:bg-gray-800"
                 title="复制链接"
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
