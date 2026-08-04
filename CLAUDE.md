@@ -57,7 +57,7 @@ Key gotchas:
 
 ### Design system
 
-`design-system/` holds a Vercel-inspired black & white design language (tokens, Figma guides, static HTML previews). It's a design reference, not runtime code — the client uses plain Tailwind classes, not these files.
+`docs/design/` holds a Vercel-inspired black & white design language (tokens, Figma guides, static HTML previews). It's a design reference, not runtime code — the client uses plain Tailwind classes, not these files.
 
 ## Conventions
 

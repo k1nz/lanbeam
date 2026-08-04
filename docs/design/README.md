@@ -15,7 +15,7 @@ Vercel-inspired black & white design language for the LAN file-transfer app.
 ## Preview
 
 ```bash
-python3 -m http.server 8765 --directory design-system
+python3 -m http.server 8765 --directory docs/design
 ```
 
 - Design system: `http://localhost:8765/preview/index.html`

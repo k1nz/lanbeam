@@ -29,7 +29,7 @@ Create a new Design file named **File Transfer — Design System**, then:
 ## Visual reference (HTML artboards)
 
 ```bash
-python3 -m http.server 8765 --directory design-system
+python3 -m http.server 8765 --directory docs/design
 # Design system → http://localhost:8765/preview/index.html
 # Desktop screens → http://localhost:8765/preview/screens.html
 ```
@@ -50,4 +50,4 @@ These artboards match the planned Figma frames and can be pasted into Figma via 
 | Share popover | `client/src/components/ShareButton.tsx` |
 | Server settings | `client/src/components/ServerSettings.tsx` |
 | Toast | `client/src/components/Toast.tsx` |
-| CSS variables (future align) | `design-system/tokens/css-variables.css` |
+| CSS variables (future align) | `docs/design/tokens/css-variables.css` |
