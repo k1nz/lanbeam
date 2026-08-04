@@ -161,16 +161,6 @@ const FileTreeNode = ({ item, onDownload, onDelete, level = 0 }: FileTreeNodePro
           </span>
         </div>
 
-        {/* 上传者列 */}
-        <div className="w-32 text-right pr-8">
-          <div className="flex items-center justify-end space-x-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-950 text-xs font-medium text-white">
-              U
-            </div>
-            <span className="text-sm text-gray-600">用户</span>
-          </div>
-        </div>
-
         {/* 操作列 */}
         <div className="w-20 text-right">
           <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">

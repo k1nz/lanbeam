@@ -133,9 +133,6 @@ function AppContent() {
                           <div className="w-28 text-right pr-8">
                             <span>最后更新</span>
                           </div>
-                          <div className="w-32 text-right pr-8">
-                            <span>上传者</span>
-                          </div>
                           {/* 行末操作列（下载/删除/更多）占位，宽度与表格行一致 */}
                           <div className="w-20"></div>
                         </div>
