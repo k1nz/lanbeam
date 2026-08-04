@@ -1,0 +1,113 @@
+name: Release Windows executable
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    name: Build Windows x64 executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build executable
+        run: pnpm package:win
+
+      - name: Smoke test executable
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path 'release/lanbeam-win-x64.exe').Path
+          & $exe --help
+          if ($LASTEXITCODE -ne 0) {
+            throw "lanbeam --help failed with exit code $LASTEXITCODE"
+          }
+
+          $workDir = Join-Path $env:RUNNER_TEMP 'lanbeam-smoke'
+          New-Item -ItemType Directory -Path $workDir -Force | Out-Null
+          $stdout = Join-Path $workDir 'stdout.log'
+          $stderr = Join-Path $workDir 'stderr.log'
+          $port = 39871
+          $process = Start-Process `
+            -FilePath $exe `
+            -ArgumentList '--port', $port `
+            -WorkingDirectory $workDir `
+            -RedirectStandardOutput $stdout `
+            -RedirectStandardError $stderr `
+            -PassThru
+
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 30; $attempt++) {
+              if ($process.HasExited) {
+                throw "LanBeam exited before becoming ready.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)"
+              }
+
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health"
+                if ($health.port -eq $port) {
+                  $ready = $true
+                  break
+                }
+              } catch {
+                Start-Sleep -Seconds 1
+              }
+            }
+
+            if (-not $ready) {
+              throw "LanBeam did not become ready.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)"
+            }
+
+            $response = Invoke-WebRequest "http://127.0.0.1:$port/" -UseBasicParsing
+            if ($response.StatusCode -ne 200 -or $response.Content -notmatch '<div id="root">') {
+              throw 'The embedded client page was not served correctly.'
+            }
+
+            if (-not (Test-Path (Join-Path $workDir 'lanbeam-files'))) {
+              throw 'The writable lanbeam-files directory was not created in the working directory.'
+            }
+          } finally {
+            if (-not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force
+            }
+          }
+
+      - name: Generate SHA-256 checksum
+        shell: pwsh
+        run: |
+          $file = 'release/lanbeam-win-x64.exe'
+          $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  lanbeam-win-x64.exe" |
+            Set-Content 'release/lanbeam-win-x64.exe.sha256' -Encoding ascii
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: LanBeam ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release/lanbeam-win-x64.exe
+            release/lanbeam-win-x64.exe.sha256

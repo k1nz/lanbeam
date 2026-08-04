@@ -53,33 +53,52 @@
 ### ⚙️ 灵活配置 / Flexible Configuration
 
 - 可动态配置服务器地址，支持局域网与远程服务器
-- 可自定义文件大小限制（默认 100MB）
+- 可自定义文件大小限制（默认 200MB）
 - 端口被占用时自动递增切换
 
 - Dynamic server URL configuration for LAN or remote servers
-- Configurable file size limit (100MB by default)
+- Configurable file size limit (200MB by default)
 - Auto-increments to the next free port when one is taken
 
 ---
 
 ## 🚀 快速开始 / Quick Start
 
-### 环境要求 / Prerequisites
+### Windows 免安装版 / Standalone Windows App
 
-- Node.js ≥ 18
-- pnpm ≥ 8
+不需要安装 Node.js。前往项目的 [GitHub Releases](https://github.com/k1nz/lanbeam/releases) 下载 `lanbeam-win-x64.exe`，在希望保存共享文件的目录中运行：
 
-### 安装与启动 / Install & Run
+No Node.js installation is required. Download `lanbeam-win-x64.exe` from [GitHub Releases](https://github.com/k1nz/lanbeam/releases), then run it in the directory where you want shared files to be stored:
+
+```powershell
+.\lanbeam-win-x64.exe
+```
+
+打开终端显示的地址即可使用。上传文件会保存在当前目录的 `lanbeam-files/`。首次运行时，Windows SmartScreen 或防火墙可能会请求确认；要供局域网设备访问，需要允许 LanBeam 使用专用网络。
+
+Open one of the URLs printed in the terminal. Uploaded files are stored in `lanbeam-files/` under the current directory. Windows SmartScreen or Firewall may ask for confirmation on first launch; allow private-network access to share with LAN devices.
+
+### 使用 npm 安装 / Install with npm
+
+已经安装 Node.js 18 或更高版本的用户也可以使用 npm：
+
+Users who already have Node.js 18 or newer can install through npm:
 
 ```bash
-# 全局安装并启动（推荐）/ Install globally and start
 npm i -g lanbeam
 lanbeam
+```
 
-# 安装依赖 / Install dependencies
+### 从源码运行 / Run from source
+
+需要 Node.js ≥ 18 和 pnpm ≥ 8：
+
+Requires Node.js ≥ 18 and pnpm ≥ 8:
+
+```bash
 pnpm install
 
-# 同时启动服务端和客户端 / Start server & client together
+# 同时启动服务端和客户端 / Start server and client together
 pnpm dev
 ```
 
@@ -99,17 +118,28 @@ After running `lanbeam`, open the URL printed in the terminal. The default is `h
 ```bash
 # 指定端口 / Set the port
 lanbeam --port 8080
+.\lanbeam-win-x64.exe --port 8080
 
 # 设置单文件最大大小（MB）/ Set the max single-file size in MB
 lanbeam --max-size 500
+.\lanbeam-win-x64.exe --max-size 500
 ```
 
 ### 生产构建 / Production Build
 
 ```bash
-pnpm build        # 构建客户端 / Build the client
-pnpm start        # 启动服务端 / Start the server
+pnpm build          # 构建客户端和服务端 / Build the client and server
+pnpm start          # 启动构建后的服务端 / Start the built server
+pnpm package:win    # 生成 Windows x64 单文件程序 / Build the standalone Windows executable
 ```
+
+构建免安装版需要 Node.js 24；普通源码开发和 npm CLI 仍支持 Node.js 18 及以上版本。
+
+Building the standalone executable requires Node.js 24. Regular source development and the npm CLI still support Node.js 18 or newer.
+
+推送形如 `v1.0.0` 的 Git 标签后，GitHub Actions 会自动构建并发布 Windows x64 可执行文件及 SHA-256 校验文件。
+
+Pushing a Git tag such as `v1.0.0` automatically builds and publishes the Windows x64 executable and its SHA-256 checksum through GitHub Actions.
 
 ---
 
@@ -145,8 +175,8 @@ Click the share button in the top-right to copy the page URL. Send it to any dev
 
 1. 确保手机与电脑连接**同一个 WiFi** / Make sure your phone and computer are on the **same WiFi**
 2. 查看电脑的局域网 IP（运行 `pnpm network` 即可显示） / Find your computer's LAN IP (run `pnpm network` to see it)
-3. 手机浏览器访问 `http://<电脑IP>:3000` / Open `http://<computer-IP>:3000` in your phone browser
-4. 若提示未连接服务器，在「服务器设置」中填写 `http://<电脑IP>:3001` / If it says no server connected, enter `http://<computer-IP>:3001` in **Server Settings**
+3. 免安装版或 npm 版访问终端显示的地址；开发模式默认访问 `http://<电脑IP>:3000` / For the standalone or npm version, use the URL printed in the terminal; development mode defaults to `http://<computer-IP>:3000`
+4. 若开发模式提示未连接服务器，在「服务器设置」中填写 `http://<电脑IP>:3001` / In development mode, if the server is disconnected, enter `http://<computer-IP>:3001` in **Server Settings**
 
 ---
 
@@ -154,14 +184,14 @@ Click the share button in the top-right to copy the page URL. Send it to any dev
 
 ### 自定义文件大小限制 / Custom File Size Limit
 
-默认最大 **100MB**，可通过启动参数修改 / The default limit is **100MB**. Change it with a startup argument:
+默认最大 **200MB**，可通过启动参数修改 / The default limit is **200MB**. Change it with a startup argument:
 
 ```bash
-# 使用命令行参数（单位为 MB）/ Command-line argument (in MB)
-node server/dist/index.js --max-size 200
+# npm CLI 或免安装版 / npm CLI or standalone executable
+lanbeam --max-size 500
 
 # 或使用环境变量 / Or via environment variable
-MAX_FILE_SIZE=200 pnpm dev:server
+MAX_FILE_SIZE=500 pnpm dev:server
 ```
 
 ---

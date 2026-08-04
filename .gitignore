@@ -9,6 +9,8 @@ yarn-error.log*
 /client/build
 /server/dist
 /dist
+/dist-executable
+/release
 
 # Environment variables
 .env

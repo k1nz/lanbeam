@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { spawn } = require('node:child_process');
 const path = require('node:path');
 
 const args = process.argv.slice(2);
@@ -38,21 +37,12 @@ process.env.LANBEAM_UPLOAD_DIR = process.env.LANBEAM_UPLOAD_DIR
     || path.resolve(process.cwd(), 'lanbeam-files');
 process.env.LANBEAM_CLIENT_DIST = path.join(packageRoot, 'client', 'dist');
 
-const serverEntry = path.join(packageRoot, 'server', 'dist', 'index.js');
-const child = spawn(process.execPath, [serverEntry, ...args], {
-    env: process.env,
-    stdio: 'inherit'
-});
-
-child.on('error', (error) => {
-    console.error(`无法启动 LanBeam: ${error.message}`);
-    process.exit(1);
-});
-
-child.on('exit', (code, signal) => {
-    if (signal) {
-        process.kill(process.pid, signal);
-        return;
-    }
-    process.exit(code ?? 1);
-});
+// 必须在当前进程加载服务端。单文件可执行版中 process.execPath 指向
+// LanBeam 自身，派生执行会导致可执行文件无限递归启动。
+if (process.pkg) {
+    // EXE 使用预先打包的服务端，避免 pnpm 工作区软链接进入虚拟文件系统。
+    require('../dist-executable/server.js');
+} else {
+    // npm 安装仍使用原有服务端构建产物，不增加发布包体积。
+    require(path.join(packageRoot, 'server', 'dist', 'index.js'));
+}

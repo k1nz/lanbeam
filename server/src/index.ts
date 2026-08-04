@@ -630,7 +630,7 @@ server.on('listening', () => {
     console.log(`   WS   /              - 文本实时共享`);
     console.log(`\n⚙️  启动参数:`);
     console.log(`   --max-size <MB>     - 设置文件大小限制 (当前: ${maxFileSize}MB)`);
-    console.log(`   例如: node index.js --max-size 200`);
+    console.log(`   例如: lanbeam --max-size 200`);
 });
 
 tryListen();
