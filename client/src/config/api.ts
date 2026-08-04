@@ -3,6 +3,11 @@ export const DEFAULT_SERVER_PORT = 3001;
 
 // 获取默认服务器地址
 const getDefaultServerUrl = (): string => {
+  // npm CLI 会由服务端直接托管构建产物，API 与页面使用同一来源。
+  if (import.meta.env.PROD) {
+    return window.location.origin;
+  }
+
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   const port = import.meta.env.VITE_SERVER_PORT || String(DEFAULT_SERVER_PORT);
@@ -79,7 +84,7 @@ const probeServer = async (url: string, timeoutMs = 800): Promise<boolean> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(`${url}/`, { signal: controller.signal });
+    const response = await fetch(`${url}/api/health`, { signal: controller.signal });
     if (!response.ok) return false;
     const data = await response.json();
     // 校验响应确实是文件传输服务器，避免误连到其他服务

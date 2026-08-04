@@ -12,6 +12,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
+const clientDistDir = process.env.LANBEAM_CLIENT_DIST || path.resolve(__dirname, '../../client/dist');
 
 // 创建 HTTP 服务器（供 Express 和 WebSocket 共用）
 const server = http.createServer(app);
@@ -170,7 +171,7 @@ if (process.env.MAX_FILE_SIZE) {
 }
 
 // 确保上传目录存在
-const uploadDir = path.join(__dirname, '../uploads');
+const uploadDir = process.env.LANBEAM_UPLOAD_DIR || path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -232,8 +233,8 @@ const upload = multer({
     }
 });
 
-// 路由
-app.get('/', (req: Request, res: Response) => {
+// 健康检查接口（客户端用于识别并自动发现 LanBeam 服务）
+app.get('/api/health', (req: Request, res: Response) => {
     const address = server.address() as AddressInfo | null;
     res.json({
         message: '文件传输服务器运行中',
@@ -533,21 +534,41 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+// npm 包运行时托管构建后的客户端；本地开发没有构建产物时保留 JSON 根路由。
+if (fs.existsSync(clientDistDir)) {
+    app.use(express.static(clientDistDir));
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(clientDistDir, 'index.html'));
+    });
+} else {
+    app.get('/', (req: Request, res: Response) => {
+        res.json({
+            message: '文件传输服务器运行中',
+            version: '1.0.0'
+        });
+    });
+}
+
 // 获取本机 IP 地址的函数
 const getLocalIPAddress = (): string[] => {
-    const nets = networkInterfaces();
     const results: string[] = [];
 
-    for (const name of Object.keys(nets)) {
-        const interfaces = nets[name];
-        if (!interfaces) continue;
-        for (const net of interfaces) {
-            // 跳过非 IPv4 和内部（即 127.x.x.x）地址
-            if (net.family === 'IPv4' && !net.internal) {
-                results.push(net.address);
+    try {
+        const nets = networkInterfaces();
+        for (const name of Object.keys(nets)) {
+            const interfaces = nets[name];
+            if (!interfaces) continue;
+            for (const net of interfaces) {
+                // 跳过非 IPv4 和内部（即 127.x.x.x）地址
+                if (net.family === 'IPv4' && !net.internal) {
+                    results.push(net.address);
+                }
             }
         }
+    } catch (error) {
+        console.warn('⚠️  无法读取局域网 IP 地址:', error instanceof Error ? error.message : error);
     }
+
     return results;
 };
 
@@ -581,6 +602,9 @@ server.on('listening', () => {
     console.log(`🚀 文件传输服务器已启动`);
     console.log(`📁 文件存储目录: ${uploadDir}`);
     console.log(`📏 文件大小限制: ${maxFileSize}MB`);
+    if (fs.existsSync(clientDistDir)) {
+        console.log(`🖥️  客户端资源目录: ${clientDistDir}`);
+    }
     if (currentPort !== PORT) {
         console.log(`🔀 端口 ${PORT} 被占用，实际监听端口: ${currentPort}`);
     }
@@ -599,7 +623,7 @@ server.on('listening', () => {
     }
 
     console.log(`\n📋 API 端点:`);
-    console.log(`   GET  /              - 服务器信息`);
+    console.log(`   GET  /api/health    - 服务器信息`);
     console.log(`   POST /api/upload    - 文件上传`);
     console.log(`   GET  /api/files     - 文件列表`);
     console.log(`   GET  /api/download  - 文件下载`);
