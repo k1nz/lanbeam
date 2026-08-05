@@ -1,6 +1,6 @@
 {
   "name": "lanbeam",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A local-first LAN file transfer and real-time sharing tool",
   "bin": {
     "lanbeam": "./bin/lanbeam.js"

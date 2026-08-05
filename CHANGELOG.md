@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-05
+
+### Fixed
+
+- Use a pnpm 8-compatible lockfile so the frozen-lockfile GitHub Actions release install succeeds.
+
 ## [1.0.0] - 2026-08-05
 
 ### Added
