@@ -80,7 +80,11 @@ pnpm package:win    # 生成 Windows x64 单文件程序
 
 构建 Windows 单文件程序需要 Node.js 24；npm CLI 和普通源码开发仍支持 Node.js 18+。
 
-推送类似 `v1.0.0` 的 Git 标签后，GitHub Actions 会自动发布 Windows 可执行文件及其 SHA-256 校验文件。
+## 发布
+
+所有面向用户的改动都记录在 [CHANGELOG.md](./CHANGELOG.md)。准备发布时，先将 `Unreleased` 中需要发布的内容移入对应版本章节，再创建 Git 标签。
+
+推送类似 `v1.0.0` 的 Git 标签后，GitHub Actions 会自动发布 Windows 可执行文件、SHA-256 校验文件，以及 `CHANGELOG.md` 中对应版本的发布说明。
 
 ## 技术栈
 

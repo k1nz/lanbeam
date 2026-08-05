@@ -80,7 +80,11 @@ pnpm package:win    # Create the standalone Windows x64 executable
 
 Creating the executable requires Node.js 24. The npm CLI and regular source development support Node.js 18+.
 
-Pushing a tag such as `v1.0.0` triggers a GitHub Actions release with the Windows executable and its SHA-256 checksum.
+## Releases
+
+All user-facing changes are recorded in [CHANGELOG.md](./CHANGELOG.md). When preparing a release, move the relevant items from `Unreleased` into a versioned section before creating its Git tag.
+
+Pushing a tag such as `v1.0.0` triggers a GitHub Actions release with the Windows executable, its SHA-256 checksum, and the matching version section from `CHANGELOG.md`.
 
 ## Stack
 
