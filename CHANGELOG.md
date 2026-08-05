@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to LanBeam are documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+## [1.0.0] - 2026-08-05
+
+### Added
+
+- Local-first LAN file and folder sharing with upload, browsing, download, deletion, and filename conflict detection.
+- Real-time text sharing and in-memory image sharing between devices on the same network.
+- Browser-based LAN access with automatic server discovery and shareable access links.
+- The global `lanbeam` npm CLI, with `--port` and `--max-size` options.
+- A standalone Windows x64 executable, published with a SHA-256 checksum.
+
+### Changed
+
+- The built client, HTTP API, and WebSocket service now run from one command and one port.
+- Uploaded files are stored in `lanbeam-files/` in the directory where LanBeam is started.
+
+### Fixed
+
+- Chinese filenames are preserved during uploads and downloads.
+- The service continues to start when LAN interface addresses cannot be read.

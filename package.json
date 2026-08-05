@@ -9,6 +9,7 @@
     "bin",
     "client/dist",
     "server/dist",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],

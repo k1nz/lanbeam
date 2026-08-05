@@ -103,11 +103,14 @@ jobs:
           "$hash  lanbeam-win-x64.exe" |
             Set-Content 'release/lanbeam-win-x64.exe.sha256' -Encoding ascii
 
+      - name: Extract release notes
+        run: node scripts/extract-release-notes.mjs "${{ github.ref_name }}" > release-notes.md
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: LanBeam ${{ github.ref_name }}
-          generate_release_notes: true
+          body_path: release-notes.md
           files: |
             release/lanbeam-win-x64.exe
             release/lanbeam-win-x64.exe.sha256
