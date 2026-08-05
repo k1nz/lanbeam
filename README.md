@@ -15,9 +15,30 @@ Uploads are stored on the machine running LanBeam. Shared text and images are cl
 
 ## Get started
 
-### Windows executable
+### macOS and Linux
 
-Download `lanbeam-win-x64.exe` from [GitHub Releases](https://github.com/k1nz/lanbeam/releases). Run it from the directory where you want uploads to live:
+Install the standalone command-line program; Node.js is not required:
+
+```bash
+curl -fsSL https://lanbeam.k1nz.top/install.sh | bash
+lanbeam
+```
+
+The installer downloads a verified binary for macOS (Apple Silicon or Intel) or Linux x64, installs it in `~/.local/bin`, and adds that directory to the current shell's startup file when needed. To install a specific release or avoid modifying shell configuration:
+
+```bash
+curl -fsSL https://lanbeam.k1nz.top/install.sh | bash -s -- --version 1.0.2 --skip-shell
+```
+
+### Windows
+
+After the [Windows Package Manager submission](https://github.com/microsoft/winget-pkgs) has been merged, install the portable command with:
+
+```powershell
+winget install k1nz.LanBeam
+```
+
+Until then, download `lanbeam-win-x64.exe` from [GitHub Releases](https://github.com/k1nz/lanbeam/releases). Run it from the directory where you want uploads to live:
 
 ```powershell
 .\lanbeam-win-x64.exe
@@ -25,7 +46,7 @@ Download `lanbeam-win-x64.exe` from [GitHub Releases](https://github.com/k1nz/la
 
 Open a URL printed in the terminal. Files are stored in `lanbeam-files/` in the current directory. Windows may ask for SmartScreen or firewall approval; allow private-network access if other LAN devices need to connect.
 
-### npm
+### npm alternative
 
 Requires Node.js 18 or later:
 
@@ -35,6 +56,14 @@ lanbeam
 ```
 
 The command prints local and LAN addresses. Uploaded files are written to `lanbeam-files/` in the directory where you run it.
+
+### Uninstall
+
+Remove the installed binary and the `# lanbeam PATH` block that the installer added to your shell profile:
+
+```bash
+rm -f ~/.local/bin/lanbeam
+```
 
 ### From source
 
@@ -75,16 +104,18 @@ For source development, run `pnpm network` to print LAN IP addresses. Use `http:
 ```bash
 pnpm build          # Build the client and server
 pnpm start          # Start the built server
-pnpm package:win    # Create the standalone Windows x64 executable
+pnpm package:all    # Create all standalone release binaries
 ```
 
-Creating the executable requires Node.js 24. The npm CLI and regular source development support Node.js 18+.
+Creating standalone binaries requires Node.js 24. The npm CLI and regular source development support Node.js 18+.
 
 ## Releases
 
 All user-facing changes are recorded in [CHANGELOG.md](./CHANGELOG.md). When preparing a release, move the relevant items from `Unreleased` into a versioned section before creating its Git tag.
 
-Pushing a tag such as `v1.0.0` triggers a GitHub Actions release with the Windows executable, its SHA-256 checksum, and the matching version section from `CHANGELOG.md`.
+Pushing a tag such as `v1.0.0` triggers a GitHub Actions release with macOS, Linux, and Windows standalone binaries, a SHA-256 checksum file, generated winget manifests, and the matching version section from `CHANGELOG.md`. The tag must match `package.json`; publishing the npm package requires the `NPM_TOKEN` repository secret.
+
+See [release maintenance](./docs/releasing.md) for GitHub Pages/DNS setup and submitting each Windows release to winget.
 
 ## Stack
 

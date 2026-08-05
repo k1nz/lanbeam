@@ -13,6 +13,7 @@ import type { Request, Response, NextFunction } from 'express';
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const clientDistDir = process.env.LANBEAM_CLIENT_DIST || path.resolve(__dirname, '../../client/dist');
+const VERSION = process.env.LANBEAM_VERSION || 'development';
 
 // 创建 HTTP 服务器（供 Express 和 WebSocket 共用）
 const server = http.createServer(app);
@@ -238,7 +239,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     const address = server.address() as AddressInfo | null;
     res.json({
         message: '文件传输服务器运行中',
-        version: '1.0.0',
+        version: VERSION,
         port: address ? address.port : currentPort,
         endpoints: {
             upload: 'POST /api/upload',

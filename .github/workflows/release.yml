@@ -1,4 +1,4 @@
-name: Release Windows executable
+name: Release LanBeam
 
 on:
   push:
@@ -9,108 +9,170 @@ permissions:
   contents: write
 
 jobs:
-  release-windows:
-    name: Build Windows x64 executable
-    runs-on: windows-latest
-
+  build-standalone:
+    name: Build ${{ matrix.asset }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            script: package:linux:x64
+            asset: lanbeam-linux-x64
+            shell: bash
+          - runner: macos-13
+            script: package:macos:x64
+            asset: lanbeam-darwin-x64
+            shell: bash
+          - runner: macos-14
+            script: package:macos:arm64
+            asset: lanbeam-darwin-arm64
+            shell: bash
+          - runner: windows-latest
+            script: package:win
+            asset: lanbeam-win-x64.exe
+            shell: pwsh
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 8.15.0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Build executable
-        run: pnpm package:win
-
-      - name: Smoke test executable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm run ${{ matrix.script }}
+      - name: Verify Windows command help
+        if: matrix.asset == 'lanbeam-win-x64.exe'
+        shell: pwsh
+        run: |
+          & (Resolve-Path 'release/${{ matrix.asset }}') --help
+          if ($LASTEXITCODE -ne 0) { throw 'lanbeam --help failed' }
+      - name: Verify Unix command help
+        if: matrix.asset != 'lanbeam-win-x64.exe'
+        shell: bash
+        run: |
+          chmod +x 'release/${{ matrix.asset }}'
+          'release/${{ matrix.asset }}' --help
+      - name: Verify Windows service runtime
+        if: matrix.asset == 'lanbeam-win-x64.exe'
         shell: pwsh
         run: |
           $exe = (Resolve-Path 'release/lanbeam-win-x64.exe').Path
-          & $exe --help
-          if ($LASTEXITCODE -ne 0) {
-            throw "lanbeam --help failed with exit code $LASTEXITCODE"
-          }
-
           $workDir = Join-Path $env:RUNNER_TEMP 'lanbeam-smoke'
           New-Item -ItemType Directory -Path $workDir -Force | Out-Null
           $stdout = Join-Path $workDir 'stdout.log'
           $stderr = Join-Path $workDir 'stderr.log'
           $port = 39871
-          $process = Start-Process `
-            -FilePath $exe `
-            -ArgumentList '--port', $port `
-            -WorkingDirectory $workDir `
-            -RedirectStandardOutput $stdout `
-            -RedirectStandardError $stderr `
-            -PassThru
-
+          $process = Start-Process -FilePath $exe -ArgumentList '--port', $port -WorkingDirectory $workDir -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
           try {
             $ready = $false
             for ($attempt = 0; $attempt -lt 30; $attempt++) {
-              if ($process.HasExited) {
-                throw "LanBeam exited before becoming ready.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)"
-              }
-
+              if ($process.HasExited) { throw "LanBeam exited early.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)" }
               try {
                 $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health"
-                if ($health.port -eq $port) {
-                  $ready = $true
-                  break
-                }
-              } catch {
-                Start-Sleep -Seconds 1
-              }
+                if ($health.port -eq $port) { $ready = $true; break }
+              } catch { Start-Sleep -Seconds 1 }
             }
-
-            if (-not $ready) {
-              throw "LanBeam did not become ready.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)"
-            }
-
+            if (-not $ready) { throw "LanBeam did not become ready.`n$(Get-Content $stdout -Raw)`n$(Get-Content $stderr -Raw)" }
             $response = Invoke-WebRequest "http://127.0.0.1:$port/" -UseBasicParsing
-            if ($response.StatusCode -ne 200 -or $response.Content -notmatch '<div id="root">') {
-              throw 'The embedded client page was not served correctly.'
-            }
-
-            if (-not (Test-Path (Join-Path $workDir 'lanbeam-files'))) {
-              throw 'The writable lanbeam-files directory was not created in the working directory.'
-            }
+            if ($response.StatusCode -ne 200 -or $response.Content -notmatch '<div id="root">') { throw 'The embedded client page was not served correctly.' }
+            if (-not (Test-Path (Join-Path $workDir 'lanbeam-files'))) { throw 'The writable lanbeam-files directory was not created.' }
           } finally {
-            if (-not $process.HasExited) {
-              Stop-Process -Id $process.Id -Force
-            }
+            if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force }
           }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: release/${{ matrix.asset }}
+          if-no-files-found: error
 
-      - name: Generate SHA-256 checksum
+  generate-winget-manifest:
+    name: Generate winget manifest
+    needs: release-binaries
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lanbeam-win-x64.exe
+          path: release
+      - name: Generate and validate manifest
         shell: pwsh
         run: |
-          $file = 'release/lanbeam-win-x64.exe'
-          $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  lanbeam-win-x64.exe" |
-            Set-Content 'release/lanbeam-win-x64.exe.sha256' -Encoding ascii
+          $version = '${{ github.ref_name }}'.TrimStart('v')
+          $hash = (Get-FileHash 'release/lanbeam-win-x64.exe' -Algorithm SHA256).Hash
+          $url = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/lanbeam-win-x64.exe"
+          node scripts/generate-winget-manifest.mjs $version $url $hash release/winget
+          winget validate --manifest "release/winget/manifests/k/k1nz/LanBeam/$version"
+          Compress-Archive -Path 'release/winget/manifests' -DestinationPath 'release/lanbeam-winget-manifests.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lanbeam-winget-manifests
+          path: release/lanbeam-winget-manifests.zip
+          if-no-files-found: error
 
-      - name: Extract release notes
-        run: node scripts/extract-release-notes.mjs "${{ github.ref_name }}" > release-notes.md
-
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+  release-binaries:
+    name: Publish GitHub Release
+    needs:
+      - build-standalone
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Generate SHA-256 checksum
+        run: |
+          cd release
+          sha256sum lanbeam-linux-x64 lanbeam-darwin-x64 lanbeam-darwin-arm64 lanbeam-win-x64.exe > lanbeam-checksums.txt
+      - run: node scripts/extract-release-notes.mjs "${{ github.ref_name }}" > release-notes.md
+      - uses: softprops/action-gh-release@v2
         with:
           name: LanBeam ${{ github.ref_name }}
           body_path: release-notes.md
           files: |
+            release/lanbeam-linux-x64
+            release/lanbeam-darwin-x64
+            release/lanbeam-darwin-arm64
             release/lanbeam-win-x64.exe
-            release/lanbeam-win-x64.exe.sha256
+            release/lanbeam-checksums.txt
+            
+  attach-winget-manifest:
+    name: Attach winget manifest
+    needs: generate-winget-manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: lanbeam-winget-manifests
+          path: release
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: release/lanbeam-winget-manifests.zip
+
+  publish-npm:
+    name: Publish npm package
+    needs: attach-winget-manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify tag version
+        run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./package.json').version")"
+      - run: pnpm typecheck
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
