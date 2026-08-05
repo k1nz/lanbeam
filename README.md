@@ -27,7 +27,7 @@ lanbeam
 The installer downloads a verified binary for macOS (Apple Silicon or Intel) or Linux x64, installs it in `~/.local/bin`, and adds that directory to the current shell's startup file when needed. To install a specific release or avoid modifying shell configuration:
 
 ```bash
-curl -fsSL https://lanbeam.k1nz.top/install.sh | bash -s -- --version 1.0.2 --skip-shell
+curl -fsSL https://lanbeam.k1nz.top/install.sh | bash -s -- --version 1.0.3 --skip-shell
 ```
 
 ### Windows

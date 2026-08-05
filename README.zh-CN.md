@@ -27,7 +27,7 @@ lanbeam
 安装器会下载经过 SHA-256 校验的 macOS（Apple Silicon 或 Intel）或 Linux x64 程序，安装至 `~/.local/bin`，并在需要时将该目录写入当前 shell 的启动文件。安装指定版本或不修改 shell 配置：
 
 ```bash
-curl -fsSL https://lanbeam.k1nz.top/install.sh | bash -s -- --version 1.0.2 --skip-shell
+curl -fsSL https://lanbeam.k1nz.top/install.sh | bash -s -- --version 1.0.3 --skip-shell
 ```
 
 ### Windows
