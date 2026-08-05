@@ -11,6 +11,7 @@
     "server/dist",
     "CHANGELOG.md",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "packageManager": "pnpm@8.15.0",
@@ -21,6 +22,10 @@
     "build": "pnpm --filter client run build && pnpm --filter server run build",
     "build:executable": "pnpm build && esbuild server/dist/index.js --bundle --platform=node --target=node24 --format=cjs --outfile=dist-executable/server.js",
     "package:win": "pnpm build:executable && pkg . --sea --targets node24-win-x64 --output release/lanbeam-win-x64.exe",
+    "package:linux:x64": "pnpm build:executable && pkg . --sea --targets node24-linux-x64 --output release/lanbeam-linux-x64",
+    "package:macos:x64": "pnpm build:executable && pkg . --sea --targets node24-macos-x64 --output release/lanbeam-darwin-x64",
+    "package:macos:arm64": "pnpm build:executable && pkg . --sea --targets node24-macos-arm64 --output release/lanbeam-darwin-arm64",
+    "package:all": "pnpm package:linux:x64 && pnpm package:macos:x64 && pnpm package:macos:arm64 && pnpm package:win",
     "prepack": "pnpm build",
     "start": "pnpm --filter server run start",
     "clean": "pnpm --recursive run clean",
@@ -69,7 +74,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=18.0.0"
   }
 }

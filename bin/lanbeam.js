@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const path = require('node:path');
+const { version } = require('../package.json');
 
 const args = process.argv.slice(2);
 const portIndex = args.indexOf('--port');
@@ -33,6 +34,8 @@ if (portIndex !== -1) {
 }
 
 const packageRoot = path.resolve(__dirname, '..');
+
+process.env.LANBEAM_VERSION = process.env.LANBEAM_VERSION || version;
 process.env.LANBEAM_UPLOAD_DIR = process.env.LANBEAM_UPLOAD_DIR
     || path.resolve(process.cwd(), 'lanbeam-files');
 process.env.LANBEAM_CLIENT_DIST = path.join(packageRoot, 'client', 'dist');
@@ -44,5 +47,5 @@ if (process.pkg) {
     require('../dist-executable/server.js');
 } else {
     // npm 安装仍使用原有服务端构建产物，不增加发布包体积。
-    require(path.join(packageRoot, 'server', 'dist', 'index.js'));
+    require('../server/dist/index.js');
 }
