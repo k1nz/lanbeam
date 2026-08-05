@@ -20,11 +20,11 @@ jobs:
             script: package:linux:x64
             asset: lanbeam-linux-x64
             shell: bash
-          - runner: macos-13
+          - runner: macos-15-intel
             script: package:macos:x64
             asset: lanbeam-darwin-x64
             shell: bash
-          - runner: macos-14
+          - runner: macos-15
             script: package:macos:arm64
             asset: lanbeam-darwin-arm64
             shell: bash
