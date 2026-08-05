@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- Generate winget manifests that pass `winget validate` for portable EXE installers (schema headers, `Commands`, no unsupported `Scope`/`PortableCommandAlias`).
+- Keep npm publish independent of the winget manifest job so a winget warning cannot skip npm release.
+
 ## [1.0.3] - 2026-08-05
 
 ### Added

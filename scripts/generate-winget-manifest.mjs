@@ -37,7 +37,8 @@ mkdirSync(directory, { recursive: true });
 
 writeFileSync(
   resolve(directory, `${filePrefix}yaml`),
-  `PackageIdentifier: ${packageIdentifier}
+  `# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.${manifestVersion}.schema.json
+PackageIdentifier: ${packageIdentifier}
 PackageVersion: ${version}
 DefaultLocale: en-US
 ManifestType: version
@@ -47,7 +48,8 @@ ManifestVersion: ${manifestVersion}
 
 writeFileSync(
   resolve(directory, `${filePrefix}locale.en-US.yaml`),
-  `PackageIdentifier: ${packageIdentifier}
+  `# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.${manifestVersion}.schema.json
+PackageIdentifier: ${packageIdentifier}
 PackageVersion: ${version}
 PackageLocale: en-US
 Publisher: k1nz
@@ -70,15 +72,16 @@ ManifestVersion: ${manifestVersion}
 
 writeFileSync(
   resolve(directory, `${filePrefix}installer.yaml`),
-  `PackageIdentifier: ${packageIdentifier}
+  `# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.${manifestVersion}.schema.json
+PackageIdentifier: ${packageIdentifier}
 PackageVersion: ${version}
+InstallerType: portable
+Commands:
+  - lanbeam
 Installers:
   - Architecture: x64
-    InstallerType: portable
-    Scope: user
     InstallerUrl: ${installerUrl}
     InstallerSha256: ${installerSha256.toUpperCase()}
-    PortableCommandAlias: lanbeam.exe
 ManifestType: installer
 ManifestVersion: ${manifestVersion}
 `,

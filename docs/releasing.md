@@ -41,7 +41,7 @@
 
 ## 提交 winget
 
-GitHub Release 附带的 `lanbeam-winget-manifests.zip` 包含 `k1nz.LanBeam` 的三文件清单，并已经在 CI 中执行 `winget validate`。要使用户可运行 `winget install k1nz.LanBeam`：
+GitHub Release 附带的 `lanbeam-winget-manifests.zip` 包含 `k1nz.LanBeam` 的三文件清单，并已经在 CI 中执行 `winget validate`。清单使用 `InstallerType: portable` 与 `Commands: [lanbeam]`，直接指向 Release 中的 `lanbeam-win-x64.exe`。要使用户可运行 `winget install k1nz.LanBeam`：
 
 1. Fork [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs)。
 2. 将压缩包中的 `manifests/k/k1nz/LanBeam/<版本>/` 复制到 fork 的相同路径。
