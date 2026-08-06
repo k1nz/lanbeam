@@ -6,7 +6,15 @@ export default defineNuxtConfig({
   // 静态生成（GitHub Pages 部署 dist/ 目录）
   ssr: true,
 
-  modules: ['@nuxtjs/i18n'],
+  modules: ['@nuxtjs/i18n', '@nuxt/icon'],
+
+  // lucide 图标：本地打包 + SVG 渲染，SSG 静态站无需在运行时请求 Iconify CDN
+  icon: {
+    mode: 'svg',
+    serverBundle: {
+      collections: ['lucide'],
+    },
+  },
 
   css: ['~/assets/css/main.css'],
 
