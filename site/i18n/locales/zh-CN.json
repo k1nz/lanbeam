@@ -1,0 +1,207 @@
+{
+  "seo": {
+    "title": "LanBeam — 局域网文件传输与实时共享",
+    "description": "LanBeam 是一个本地优先的局域网文件传输与实时共享工具。无需账号、无需云服务，同一网络下的任何设备通过浏览器即可上传、下载文件并实时共享文字与图片。"
+  },
+  "nav": {
+    "features": "特性",
+    "usage": "用法",
+    "install": "安装",
+    "privacy": "隐私",
+    "faq": "FAQ",
+    "github": "GitHub",
+    "installCta": "立即安装",
+    "langLabel": "切换语言"
+  },
+  "hero": {
+    "badge": "v1.0.3 · 本地优先 · 零账号",
+    "titleA": "一台机器运行，",
+    "titleB": "全网设备秒互传",
+    "desc": "LanBeam 是一个本地优先的局域网文件传输与实时共享工具。在同一网络下启动它，任何设备用浏览器就能上传、下载文件，实时共享文字与图片 —— 无需账号，也不经过任何云端。",
+    "installCta": "安装 LanBeam",
+    "releases": "GitHub Releases",
+    "platformNote": "支持 macOS / Windows / Linux · 单文件可执行 · npm / winget / curl 均可安装",
+    "terminalAria": "终端示例：安装并启动 LanBeam",
+    "terminal": {
+      "started": "🚀 文件传输服务器已启动",
+      "storageDir": "📁 文件存储目录: /Users/you/lanbeam-files",
+      "sizeLimit": "📏 文件大小限制: 200MB",
+      "access": "🌐 访问地址:",
+      "local": "本地访问:",
+      "lan": "🔗 局域网访问:",
+      "tip": "💡 其他设备可以通过上述局域网地址访问文件传输服务"
+    }
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "能做什么",
+    "desc": "一个运行在你的电脑上的轻量服务，覆盖局域网内最常见的共享需求。",
+    "items": [
+      {
+        "title": "拖拽即传",
+        "desc": "把文件或整个文件夹拖进浏览器即可上传，自动保留目录结构。每台设备都能随时下载或删除。"
+      },
+      {
+        "title": "实时共享",
+        "desc": "一条共享笔记，在打开的所有设备间实时同步。粘贴一张图片，立即可见 —— 适合互发截图。"
+      },
+      {
+        "title": "零门槛使用",
+        "desc": "对方不需要安装任何东西 —— 把地址发过去，任何浏览器打开即用，手机电脑都行。"
+      },
+      {
+        "title": "本地优先",
+        "desc": "文件只存在运行 LanBeam 的那台机器上。无需账号、无需云盘，流量不出局域网。"
+      },
+      {
+        "title": "大文件无压力",
+        "desc": "默认支持单文件最大 200MB，可用 --max-size 调整。局域网内传输走满带宽。"
+      },
+      {
+        "title": "隐私安全",
+        "desc": "共享的笔记与图片只保存在内存中，服务器停止即清空。不上传任何数据，也无任何遥测。"
+      }
+    ]
+  },
+  "steps": {
+    "eyebrow": "Quick Start",
+    "title": "三步上手",
+    "desc": "从安装到第一台设备连接，全程不超过一分钟。",
+    "items": [
+      {
+        "title": "安装",
+        "tag": "macOS / Linux",
+        "desc": "macOS 与 Linux 可用一键脚本安装独立程序，无需 Node.js；Windows 使用 winget 或直接下载可执行文件。"
+      },
+      {
+        "title": "启动",
+        "tag": "任意系统",
+        "desc": "在终端运行 lanbeam，服务自动从 3001 端口开始，被占用时自动递增寻找可用端口。"
+      },
+      {
+        "title": "连接",
+        "tag": "任何设备",
+        "desc": "把终端打印的局域网地址发给同一网络下的任何设备，用浏览器打开即可上传、下载与共享。对方无需安装任何软件。"
+      }
+    ]
+  },
+  "install": {
+    "eyebrow": "Install",
+    "title": "想怎么装都行",
+    "desc": "LanBeam 以 <b class=\"font-semibold text-white\">npm 包</b>发布，同时提供 macOS、Linux、Windows 的<b class=\"font-semibold text-white\">独立可执行文件</b>与 winget 安装渠道。选择你习惯的那一种。",
+    "parenOpen": "（",
+    "parenClose": "）",
+    "colon": "：",
+    "channels": [
+      {
+        "title": "npm 全局安装",
+        "note": "需 Node.js 18+",
+        "cmd": "npm i -g lanbeam"
+      },
+      {
+        "title": "curl 一键脚本",
+        "note": "macOS / Linux，无需 Node.js",
+        "cmd": "curl -fsSL https://lanbeam.k1nz.top/install.sh | bash"
+      },
+      {
+        "title": "Windows",
+        "note": "winget 或 GitHub Releases",
+        "cmd": "winget install k1nz.LanBeam"
+      },
+      {
+        "title": "从源码运行",
+        "note": "适合二次开发",
+        "cmd": "git clone && pnpm install && pnpm dev"
+      }
+    ],
+    "terminal": {
+      "usage": "用法: lanbeam [options]",
+      "port": "  --port <端口>     指定端口 (默认 3001)",
+      "maxSize": "  --max-size <MB>   单文件大小限制 (默认 200)",
+      "help": "  --help              显示帮助",
+      "commentPort": "# 使用指定端口",
+      "commentMaxSize": "# 限制单文件 500MB",
+      "commentIncrement": "# 端口被占用时自动递增 (3001 → 3020)",
+      "commentFallback": "# 3001 被占用 → 自动切换到 3002"
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "数据完全留在你的局域网里",
+    "desc1": "LanBeam 没有服务器端，也<b class=\"font-semibold text-white\">不收集任何数据</b>。上传的文件只保存在运行它的那台机器上；共享的文字与图片仅存在于内存中，进程一停就清空。",
+    "desc2": "同一网络下的设备才能访问 —— 局域网之外无法触达，无需账号，也没有云端中转。",
+    "sep": "——",
+    "points": [
+      {
+        "title": "无账号、无云端",
+        "desc": "没有任何服务在中间记录你的活动"
+      },
+      {
+        "title": "文件只在本机",
+        "desc": "上传的内容存在 lanbeam-files/ 目录，删掉即彻底移除"
+      },
+      {
+        "title": "文字图片仅在内存",
+        "desc": "服务器停止即清空，不落盘、不持久化"
+      },
+      {
+        "title": "局域网边界",
+        "desc": "仅绑定局域网地址，外部网络无法访问"
+      },
+      {
+        "title": "开源 MIT 协议",
+        "desc": "全部代码公开，可自行审计"
+      }
+    ]
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "常见问题",
+    "items": [
+      {
+        "q": "别人需要安装 LanBeam 才能接收文件吗？",
+        "a": "不需要。把终端打印的局域网地址发给对方，任何浏览器（手机、平板、电脑）打开即可上传和下载文件。LanBeam 是浏览器即客户端。"
+      },
+      {
+        "q": "在外网（不在同一 WiFi）时能用吗？",
+        "a": "不能，LanBeam 定位就是局域网工具。设备需要连接到同一个网络（同一 WiFi 或有线网络）。这保证了任何数据不出局域网，也不经过云端。"
+      },
+      {
+        "q": "单个文件大小有限制吗？",
+        "a": "默认每个文件最大 200MB。可以用 <code>lanbeam --max-size 500</code> 调整为 500MB，也可以通过环境变量 <code>MAX_FILE_SIZE</code> 设置。"
+      },
+      {
+        "q": "端口被占用怎么办？",
+        "a": "默认从 3001 端口启动；如果被占用，会自动递增尝试（3001 → 3020）直到找到可用端口，并在终端打印实际使用的地址。也可以手动指定 <code>lanbeam --port 8080</code>。"
+      },
+      {
+        "q": "上传的文件存放在哪里？",
+        "a": "存放在运行 LanBeam 的目录下的 <code>lanbeam-files/</code>（源码运行时是 <code>server/uploads/</code>）。文件直接落盘为普通文件，随时可以在系统里访问、备份或删除。"
+      },
+      {
+        "q": "共享的文字和图片会保存下来吗？",
+        "a": "不会。它们只保存在服务器内存中（图片最多保留最近 20 张、每张最大 10MB），服务器停止即全部清空，不会写入磁盘。"
+      },
+      {
+        "q": "需要注册账号或付费吗？",
+        "a": "完全不需要。LanBeam 免费、开源（MIT 协议）、无任何账号体系。安装即用，文件与数据全部留在自己的设备上。"
+      }
+    ]
+  },
+  "cta": {
+    "titleA": "文件传输，",
+    "titleB": "本不该这么麻烦",
+    "desc": "安装一次，随时启动。没有账号、没有上传云盘、没有第三方 —— 局域网内最快的传文件方式。",
+    "installCta": "安装 LanBeam",
+    "viewSource": "查看源码"
+  },
+  "footer": {
+    "changelog": "更新日志",
+    "copyright": "© 2026 LanBeam · 开源 · MIT License",
+    "tagline": "本地优先 · 零账号 · 零遥测"
+  },
+  "copy": {
+    "copy": "复制",
+    "copied": "已复制"
+  }
+}

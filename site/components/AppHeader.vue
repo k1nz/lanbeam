@@ -1,18 +1,59 @@
 <template>
   <nav class="sticky top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
-    <div class="mx-auto flex h-[62px] max-w-[1080px] items-center justify-between px-6">
+    <!-- 三列网格：左右 1fr 等宽，中间 auto 放导航 → 导航严格居中 -->
+    <div class="mx-auto grid h-[62px] max-w-[1080px] grid-cols-[1fr_auto_1fr] items-center px-6">
+      <!-- 左：Logo -->
       <a href="#top" class="flex items-center gap-2.5 text-[15px] font-semibold no-underline">
         <LanBeamLogo />
         <span>LanBeam</span>
       </a>
 
+      <!-- 中：导航 -->
       <div class="hidden items-center gap-7 md:flex">
         <a v-for="link in links" :key="link.href" :href="link.href" class="text-[13.5px] text-mist no-underline transition-colors hover:text-white">
           {{ link.label }}
         </a>
       </div>
 
-      <div class="flex items-center gap-3">
+      <!-- 右：语言切换 + GitHub + CTA -->
+      <div class="flex items-center justify-end gap-3">
+        <!-- 语言切换（图标按钮 + 下拉） -->
+        <div ref="langWrapRef" class="relative">
+          <button
+            type="button"
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white/2 text-mist transition-colors hover:border-line2 hover:text-white"
+            :aria-label="t('nav.langLabel')"
+            aria-haspopup="menu"
+            :aria-expanded="open ? 'true' : 'false'"
+            @click="open = !open"
+          >
+            <Icon name="lucide:languages" class="h-[18px] w-[18px]" />
+          </button>
+
+          <Transition
+            enter-active-class="transition duration-150 ease-out"
+            enter-from-class="translate-y-1 opacity-0"
+            leave-active-class="transition duration-100 ease-in"
+            leave-to-class="translate-y-1 opacity-0"
+          >
+            <div v-if="open" role="menu" class="absolute right-0 top-full z-50 mt-2 min-w-[144px] rounded-xl border border-line bg-panel p-1 shadow-2xl shadow-black/40">
+              <button
+                v-for="loc in locales"
+                :key="loc.code"
+                type="button"
+                role="menuitemradio"
+                class="flex w-full items-center justify-between gap-4 rounded-lg px-3 py-2 text-[13px] no-underline transition-colors hover:bg-white/5"
+                :class="locale === loc.code ? 'text-white' : 'text-mist hover:text-white'"
+                :aria-checked="locale === loc.code ? 'true' : 'false'"
+                @click="switchTo(loc.code)"
+              >
+                <span>{{ loc.name }}</span>
+                <Icon v-if="locale === loc.code" name="lucide:check" class="h-3.5 w-3.5 text-accent" />
+              </button>
+            </div>
+          </Transition>
+        </div>
+
         <a
           href="https://github.com/k1nz/lanbeam"
           target="_blank"
@@ -24,18 +65,49 @@
           </svg>
           GitHub
         </a>
-        <a href="#install" class="btn btn-lime">立即安装</a>
+        <a href="#install" class="btn btn-lime">{{ t('nav.installCta') }}</a>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-const links = [
-  { label: '特性', href: '#features' },
-  { label: '用法', href: '#usage' },
-  { label: '安装', href: '#install' },
-  { label: '隐私', href: '#privacy' },
-  { label: 'FAQ', href: '#faq' },
-]
+const { t, locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+
+const links = computed(() => [
+  { label: t('nav.features'), href: '#features' },
+  { label: t('nav.usage'), href: '#usage' },
+  { label: t('nav.install'), href: '#install' },
+  { label: t('nav.privacy'), href: '#privacy' },
+  { label: t('nav.faq'), href: '#faq' },
+])
+
+// 语言下拉：点击外部 / Esc 关闭
+const open = ref(false)
+const langWrapRef = ref<HTMLElement | null>(null)
+
+function switchTo(code: string) {
+  open.value = false
+  navigateTo(switchLocalePath(code as Parameters<typeof switchLocalePath>[0]))
+}
+
+function onDocumentClick(e: MouseEvent) {
+  if (langWrapRef.value && !langWrapRef.value.contains(e.target as Node)) {
+    open.value = false
+  }
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') open.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>

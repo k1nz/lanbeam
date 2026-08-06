@@ -6,28 +6,45 @@ export default defineNuxtConfig({
   // 静态生成（GitHub Pages 部署 dist/ 目录）
   ssr: true,
 
+  modules: ['@nuxtjs/i18n', '@nuxt/icon'],
+
+  // lucide 图标：本地打包 + SVG 渲染，SSG 静态站无需在运行时请求 Iconify CDN
+  icon: {
+    mode: 'svg',
+    serverBundle: {
+      collections: ['lucide'],
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
   vite: {
     plugins: [tailwindcss()],
   },
 
+  // 多语言：中文为默认（/），英文走 /en
+  i18n: {
+    locales: [
+      { code: 'zh-CN', name: '中文', file: 'zh-CN.json' },
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    defaultLocale: 'zh-CN',
+    langDir: 'locales',
+    strategy: 'prefix_except_default',
+    baseUrl: 'https://lanbeam.k1nz.top',
+    // SSG 静态站点：禁用浏览器自动探测，避免 hydration 不一致与重定向
+    detectBrowserLanguage: false,
+    lazy: false,
+    bundle: { optimizeTranslationDirective: false },
+    // FAQ / 段落文案中带有 <code>/<b>，需要允许消息内的 HTML（配合 v-html 渲染）
+    compilation: { strictMessage: false },
+  },
+
   app: {
     head: {
-      htmlAttrs: { lang: 'zh-CN' },
-      title: 'LanBeam — 局域网文件传输与实时共享',
+      // lang 与 title/description 由 app.vue 按当前语言设置
       meta: [
-        {
-          name: 'description',
-          content:
-            'LanBeam 是一个本地优先的局域网文件传输与实时共享工具。无需账号、无需云服务，同一网络下的任何设备通过浏览器即可上传、下载文件并实时共享文字与图片。',
-        },
         { name: 'theme-color', content: '#0a0a0a' },
-        { property: 'og:title', content: 'LanBeam — 局域网文件传输与实时共享' },
-        {
-          property: 'og:description',
-          content: '本地优先的局域网文件传输工具。零账号、零云端，一条命令，同网络设备直接用浏览器互传文件。',
-        },
         { property: 'og:type', content: 'website' },
       ],
       link: [

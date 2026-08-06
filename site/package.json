@@ -11,6 +11,9 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.121",
+    "@nuxt/icon": "^1.15.0",
+    "@nuxtjs/i18n": "^9.5.6",
     "@tailwindcss/vite": "^4.3.3",
     "nuxt": "^3.21.11",
     "tailwindcss": "^4.3.3"

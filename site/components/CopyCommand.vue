@@ -14,12 +14,14 @@
       <svg v-else width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polyline points="20 6 9 17 4 12" />
       </svg>
-      {{ copied ? '已复制' : '复制' }}
+      {{ copied ? t('copy.copied') : t('copy.copy') }}
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 const props = defineProps<{
   command: string
 }>()
@@ -63,3 +65,28 @@ async function copy() {
   document.body.removeChild(ta)
 }
 </script>
+
+<style scoped>
+/* 横向滚动条默认隐藏，鼠标悬浮时才显示 */
+pre {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease;
+}
+pre:hover {
+  scrollbar-color: var(--color-line2) transparent;
+}
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+pre::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+pre:hover::-webkit-scrollbar-thumb {
+  background: var(--color-line2);
+}
+</style>
