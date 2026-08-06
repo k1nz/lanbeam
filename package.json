@@ -19,6 +19,7 @@
     "dev": "pnpm -r --parallel --filter server --filter client run dev --host",
     "dev:server": "pnpm --filter server run dev",
     "dev:client": "pnpm --filter client run dev",
+    "dev:site": "pnpm --filter site run dev",
     "build": "pnpm --filter client run build && pnpm --filter server run build",
     "build:executable": "pnpm build && esbuild server/dist/index.js --bundle --platform=node --target=node24 --format=cjs --outfile=dist-executable/server.js",
     "package:win": "pnpm build:executable && pkg . --sea --targets node24-win-x64 --output release/lanbeam-win-x64.exe",

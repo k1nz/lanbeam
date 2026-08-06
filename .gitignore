@@ -11,6 +11,10 @@ yarn-error.log*
 /dist
 /dist-executable
 /release
+/site/dist
+/site/.nuxt
+/site/.output
+/site/.data
 
 # Environment variables
 .env

@@ -7,6 +7,7 @@ on:
     paths:
       - 'site/**'
       - '.github/workflows/pages.yml'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:
 
 permissions:
@@ -26,9 +27,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate static site
+        working-directory: site
+        run: pnpm build
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: site/dist
+
       - id: deployment
         uses: actions/deploy-pages@v4

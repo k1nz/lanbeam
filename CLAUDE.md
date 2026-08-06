@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A local LAN file-transfer & sharing tool (conceptually a browser-based `http-server`). No accounts, no auth — any device on the same network can upload/download files and share text/images in real time. This is a **local-first tool**: there is no concept of users, uploaders, or multi-tenant ownership anywhere in the codebase — don't introduce one.
 
-Monorepo (pnpm workspace) with two packages plus root scripts:
+Monorepo (pnpm workspace) with three packages plus root scripts:
 
 - `server/` — Express + `ws` (WebSocket). REST API for file CRUD + real-time text/image sharing.
 - `client/` — React 18 + Vite + Tailwind. SPA that talks to the server.
+- `site/` — Nuxt 3 (SSG) + Tailwind v4. The public marketing site, deployed by `.github/workflows/pages.yml` to GitHub Pages (`lanbeam.k1nz.top`). Content lives in `components/` (one section per component); `public/` holds `CNAME` and `install.sh` (copied into the build output automatically). Dev: `pnpm dev:site`, build: `pnpm --filter site run build` → `site/dist`.
 - `scripts/network-info.ts` — prints LAN IPs (root tsconfig, compiled with tsgo).
 
 All TypeScript is compiled with **tsgo** (the native Go compiler), not `tsc`. Each package has its own `tsconfig.json`.
@@ -21,6 +22,7 @@ pnpm install        # install everything
 pnpm dev            # run server + client together (client :3000, server :3001)
 pnpm dev:server     # server only, via nodemon (rebuilds on src changes)
 pnpm dev:client     # Vite dev server only
+pnpm dev:site       # Nuxt dev server for the marketing site
 pnpm build          # build client, then server (order matters: client builds first)
 pnpm start          # run built server (node dist/index.js)
 pnpm typecheck      # tsgo --noEmit on server, client, and root scripts
