@@ -1,0 +1,207 @@
+{
+  "seo": {
+    "title": "LanBeam — LAN file transfer & real-time sharing",
+    "description": "LanBeam is a local-first LAN file transfer and real-time sharing tool. No accounts, no cloud service — any device on the same network uploads, downloads, and shares text and images right from the browser."
+  },
+  "nav": {
+    "features": "Features",
+    "usage": "Usage",
+    "install": "Install",
+    "privacy": "Privacy",
+    "faq": "FAQ",
+    "github": "GitHub",
+    "installCta": "Install",
+    "langLabel": "Switch language"
+  },
+  "hero": {
+    "badge": "v1.0.3 · Local-first · No accounts",
+    "titleA": "One machine running,",
+    "titleB": "every device on the LAN shares in seconds",
+    "desc": "LanBeam is a local-first file transfer and real-time sharing tool for your network. Launch it on one machine and any device on the same network can upload, download, and share text and images right from the browser — no accounts, and nothing ever touches the cloud.",
+    "installCta": "Install LanBeam",
+    "releases": "GitHub Releases",
+    "platformNote": "macOS / Windows / Linux · Standalone binary · Install via npm / winget / curl",
+    "terminalAria": "Terminal example: install and launch LanBeam",
+    "terminal": {
+      "started": "🚀 File transfer server started",
+      "storageDir": "📁 File storage directory: /Users/you/lanbeam-files",
+      "sizeLimit": "📏 Max file size: 200MB",
+      "access": "🌐 Access address:",
+      "local": "Local access:",
+      "lan": "🔗 LAN access:",
+      "tip": "💡 Other devices can access the file transfer service via the LAN address above"
+    }
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "What it does",
+    "desc": "A lightweight service running on your computer that covers the most common sharing needs on your LAN.",
+    "items": [
+      {
+        "title": "Drag-and-drop transfer",
+        "desc": "Drag files or whole folders into the browser to upload, keeping the directory structure intact. Every device can download or delete at any time."
+      },
+      {
+        "title": "Real-time sharing",
+        "desc": "One shared note, synced in real time across every open device. Paste an image and it's instantly visible — perfect for swapping screenshots."
+      },
+      {
+        "title": "Zero-friction access",
+        "desc": "The other side needs nothing installed — just send the address; any browser opens it instantly, on phones and computers alike."
+      },
+      {
+        "title": "Local-first",
+        "desc": "Files live only on the machine running LanBeam. No accounts, no cloud drives — traffic never leaves your LAN."
+      },
+      {
+        "title": "Large files, no sweat",
+        "desc": "Supports files up to 200MB by default, adjustable with --max-size. LAN transfers run at full bandwidth."
+      },
+      {
+        "title": "Private & secure",
+        "desc": "Shared notes and images live in memory only and are wiped the moment the server stops. Nothing is uploaded, and there is no telemetry."
+      }
+    ]
+  },
+  "steps": {
+    "eyebrow": "Quick Start",
+    "title": "Get started in 3 steps",
+    "desc": "From installation to your first connected device in under a minute.",
+    "items": [
+      {
+        "title": "Install",
+        "tag": "macOS / Linux",
+        "desc": "macOS and Linux get a standalone binary via a one-line script — no Node.js needed; Windows uses winget or a direct download."
+      },
+      {
+        "title": "Launch",
+        "tag": "Any OS",
+        "desc": "Run lanbeam in your terminal. The service starts on port 3001 and automatically increments to find a free port when it's taken."
+      },
+      {
+        "title": "Connect",
+        "tag": "Any device",
+        "desc": "Send the LAN address from your terminal to any device on the same network. Opening it in a browser enables upload, download, and sharing — nothing to install on the other side."
+      }
+    ]
+  },
+  "install": {
+    "eyebrow": "Install",
+    "title": "Install it your way",
+    "desc": "LanBeam ships as an <b class=\"font-semibold text-white\">npm package</b>, with <b class=\"font-semibold text-white\">standalone executables</b> for macOS, Linux, and Windows plus a winget channel. Pick whichever you prefer.",
+    "parenOpen": " (",
+    "parenClose": ")",
+    "colon": ": ",
+    "channels": [
+      {
+        "title": "npm global install",
+        "note": "requires Node.js 18+",
+        "cmd": "npm i -g lanbeam"
+      },
+      {
+        "title": "curl one-liner",
+        "note": "macOS / Linux, no Node.js",
+        "cmd": "curl -fsSL https://lanbeam.k1nz.top/install.sh | bash"
+      },
+      {
+        "title": "Windows",
+        "note": "winget or GitHub Releases",
+        "cmd": "winget install k1nz.LanBeam"
+      },
+      {
+        "title": "Run from source",
+        "note": "for development",
+        "cmd": "git clone && pnpm install && pnpm dev"
+      }
+    ],
+    "terminal": {
+      "usage": "Usage: lanbeam [options]",
+      "port": "  --port <port>      specify port (default 3001)",
+      "maxSize": "  --max-size <MB>    max file size (default 200)",
+      "help": "  --help             show help",
+      "commentPort": "# use a custom port",
+      "commentMaxSize": "# cap a single file at 500MB",
+      "commentIncrement": "# auto-increment when the port is taken (3001 → 3020)",
+      "commentFallback": "# 3001 taken → auto-switch to 3002"
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "Your data stays entirely on your LAN",
+    "desc1": "LanBeam has no server side and <b class=\"font-semibold text-white\">collects no data</b>. Uploaded files live only on the machine running it; shared text and images exist in memory only and are cleared the moment the process stops.",
+    "desc2": "Only devices on the same network can reach it — nothing outside your LAN can, there are no accounts, and there's no cloud relay.",
+    "sep": " — ",
+    "points": [
+      {
+        "title": "No accounts, no cloud",
+        "desc": "no service in the middle logging your activity"
+      },
+      {
+        "title": "Files stay on your machine",
+        "desc": "uploads go to the lanbeam-files/ directory and are gone when deleted"
+      },
+      {
+        "title": "Text & images in memory only",
+        "desc": "cleared when the server stops — never written to disk, never persisted"
+      },
+      {
+        "title": "LAN-only boundary",
+        "desc": "bound to LAN addresses only; unreachable from outside networks"
+      },
+      {
+        "title": "Open source, MIT licensed",
+        "desc": "all code public and auditable"
+      }
+    ]
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "q": "Do recipients need LanBeam installed to receive files?",
+        "a": "No. Just send them the LAN address from your terminal — anyone can open it in any browser (phone, tablet, or computer) to upload and download. With LanBeam, the browser is the client."
+      },
+      {
+        "q": "Does it work over the internet (not on the same Wi-Fi)?",
+        "a": "No — LanBeam is designed to be a LAN tool. Devices must be on the same network (same Wi-Fi or wired). This guarantees your data never leaves the LAN and never touches the cloud."
+      },
+      {
+        "q": "Is there a per-file size limit?",
+        "a": "By default each file is capped at 200MB. Use <code>lanbeam --max-size 500</code> to allow 500MB, or set the <code>MAX_FILE_SIZE</code> environment variable."
+      },
+      {
+        "q": "What if the port is already in use?",
+        "a": "It starts on port 3001 by default; if taken, it automatically increments (3001 → 3020) until a free port is found and prints the actual address. You can also set one manually with <code>lanbeam --port 8080</code>."
+      },
+      {
+        "q": "Where are uploaded files stored?",
+        "a": "In the <code>lanbeam-files/</code> directory under where you run LanBeam (<code>server/uploads/</code> when running from source). Files are written as ordinary files, so you can access, back up, or delete them anytime."
+      },
+      {
+        "q": "Are shared text and images saved?",
+        "a": "No. They only live in server memory (up to the last 20 images, 10MB each); everything is cleared when the server stops and is never written to disk."
+      },
+      {
+        "q": "Do I need to register or pay?",
+        "a": "Not at all. LanBeam is free, open source (MIT), and has no account system. Install and go — your files and data stay on your own devices."
+      }
+    ]
+  },
+  "cta": {
+    "titleA": "File transfer",
+    "titleB": "shouldn't be this hard",
+    "desc": "Install once, launch anytime. No accounts, no cloud uploads, no third parties — the fastest way to move files on your LAN.",
+    "installCta": "Install LanBeam",
+    "viewSource": "View source"
+  },
+  "footer": {
+    "changelog": "Changelog",
+    "copyright": "© 2026 LanBeam · Open source · MIT License",
+    "tagline": "Local-first · No accounts · Zero telemetry"
+  },
+  "copy": {
+    "copy": "Copy",
+    "copied": "Copied"
+  }
+}

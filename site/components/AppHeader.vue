@@ -13,6 +13,20 @@
       </div>
 
       <div class="flex items-center gap-3">
+        <!-- 语言切换 -->
+        <div class="flex items-center rounded-full border border-line bg-white/2 p-0.5 text-[12.5px]" role="group" :aria-label="t('nav.langLabel')">
+          <NuxtLink
+            v-for="loc in locales"
+            :key="loc.code"
+            :to="switchLocalePath(loc.code)"
+            class="rounded-full px-2.5 py-1 no-underline transition-colors"
+            :class="locale === loc.code ? 'bg-white/10 text-white' : 'text-mist hover:text-white'"
+            :aria-current="locale === loc.code ? 'true' : undefined"
+          >
+            {{ loc.name }}
+          </NuxtLink>
+        </div>
+
         <a
           href="https://github.com/k1nz/lanbeam"
           target="_blank"
@@ -24,18 +38,21 @@
           </svg>
           GitHub
         </a>
-        <a href="#install" class="btn btn-lime">立即安装</a>
+        <a href="#install" class="btn btn-lime">{{ t('nav.installCta') }}</a>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-const links = [
-  { label: '特性', href: '#features' },
-  { label: '用法', href: '#usage' },
-  { label: '安装', href: '#install' },
-  { label: '隐私', href: '#privacy' },
-  { label: 'FAQ', href: '#faq' },
-]
+const { t, locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+
+const links = computed(() => [
+  { label: t('nav.features'), href: '#features' },
+  { label: t('nav.usage'), href: '#usage' },
+  { label: t('nav.install'), href: '#install' },
+  { label: t('nav.privacy'), href: '#privacy' },
+  { label: t('nav.faq'), href: '#faq' },
+])
 </script>
