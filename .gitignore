@@ -70,3 +70,7 @@ jspm_packages/
 .yarn-integrity
 
 .history
+
+docs/design/logo
+.claude/worktrees
+
