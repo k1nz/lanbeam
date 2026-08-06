@@ -13,18 +13,20 @@
         </div>
       </div>
       <div class="mt-7 flex flex-wrap justify-between gap-3.5 text-xs text-faint">
-        <span>© 2026 LanBeam · 开源 · MIT License</span>
-        <span>本地优先 · 零账号 · 零遥测</span>
+        <span>{{ t('footer.copyright') }}</span>
+        <span>{{ t('footer.tagline') }}</span>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-const links = [
+const { t } = useI18n()
+
+const links = computed(() => [
   { label: 'GitHub', href: 'https://github.com/k1nz/lanbeam' },
   { label: 'Releases', href: 'https://github.com/k1nz/lanbeam/releases' },
-  { label: '更新日志', href: 'https://github.com/k1nz/lanbeam/blob/main/CHANGELOG.md' },
+  { label: t('footer.changelog'), href: 'https://github.com/k1nz/lanbeam/blob/main/CHANGELOG.md' },
   { label: 'MIT License', href: 'https://github.com/k1nz/lanbeam/blob/main/LICENSE' },
-]
+])
 </script>

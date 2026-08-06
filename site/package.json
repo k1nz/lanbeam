@@ -11,6 +11,7 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@nuxtjs/i18n": "^9.5.6",
     "@tailwindcss/vite": "^4.3.3",
     "nuxt": "^3.21.11",
     "tailwindcss": "^4.3.3"
