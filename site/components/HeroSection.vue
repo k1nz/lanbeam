@@ -7,8 +7,12 @@
         {{ t('hero.badge') }}
       </span>
 
-      <!-- 主标题：WebGL 交互式液体扭曲 -->
-      <LiquidTitle :line-a="t('hero.titleA')" :line-b="t('hero.titleB')" />
+      <!-- 主标题 -->
+      <h1 class="mx-auto mt-8 max-w-[800px] text-[clamp(38px,6.2vw,64px)] font-bold leading-[1.12] tracking-tight">
+        {{ t('hero.titleA') }}
+        <br />
+        <span class="bg-gradient-to-r from-white via-white/60 to-accent bg-clip-text text-transparent">{{ t('hero.titleB') }}</span>
+      </h1>
 
       <p class="mx-auto mt-5 max-w-[600px] text-[clamp(15px,2.4vw,17.5px)] leading-[1.75] text-mist">
         {{ t('hero.desc') }}
