@@ -1,7 +1,8 @@
 <template>
   <nav class="sticky top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
-    <!-- 三列网格：左右 1fr 等宽，中间 auto 放导航 → 导航严格居中 -->
-    <div class="mx-auto grid h-[62px] max-w-[1080px] grid-cols-[1fr_auto_1fr] items-center px-6">
+    <!-- 网格：移动端两列（左 Logo / 右操作区），md+ 三列（1fr_auto_1fr）让中间导航严格居中。
+         移动端导航 display:none 不占位，若仍用三列会把右侧操作区排进中间 auto 列导致右端空出一截 -->
+    <div class="mx-auto grid h-[62px] max-w-[1080px] grid-cols-[1fr_auto] items-center px-6 md:grid-cols-[1fr_auto_1fr]">
       <!-- 左：Logo -->
       <a href="#top" class="flex items-center gap-2.5 text-[15px] font-semibold no-underline">
         <LanBeamLogo />

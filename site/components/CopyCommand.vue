@@ -3,7 +3,7 @@
     <pre class="block overflow-x-auto whitespace-pre rounded-lg border border-line bg-ink px-3.5 py-2.5 pr-14 font-mono text-[12.5px] leading-[1.7] text-neutral-200">{{ command }}</pre>
     <button
       type="button"
-      class="absolute right-2 top-2 inline-flex items-center gap-1.5 rounded-md border border-line2 bg-white/5 px-2.5 py-1.5 font-sans text-[11.5px] text-mist transition-colors hover:border-neutral-500 hover:text-white"
+      class="absolute right-2 top-2 inline-flex items-center gap-1.5 rounded-md border border-line2 bg-panel2 px-2.5 py-1.5 font-sans text-[11.5px] text-mist transition-colors hover:border-neutral-500 hover:bg-neutral-800 hover:text-white"
       :class="{ '!border-accent !bg-accent !text-ink': copied }"
       @click="copy"
     >
